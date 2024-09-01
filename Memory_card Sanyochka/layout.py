@@ -70,3 +70,26 @@ layout_line4.addStretch(1)
 
 layout_card = QVBoxLayout()
 layout_card.addLayout(layout_line1, stretch=1)
+layout_card.addLayout(layout_line2, stretch=2)
+layout_card.addLayout(layout_line3, stretch=8)
+layout_card.addStretch(1)
+layout_card.addLayout(layout_line4, stretch=1)
+layout_card.addStretch(1)
+layout_card.setSpacing(5)
+
+def show_result():
+    RadioGroupBox.hide()
+    AnsGroupBox.show()
+    btn_OK.setText("Наступне питання")
+
+
+def show_question():
+    RadioGroupBox.show()
+    AnsGroupBox.hide()
+    btn_OK.setText("Відповісти")
+    RadioGroup.setExclusive(False)
+    rbtn_1.setChecked(False)
+    rbtn_2.setChecked(False)
+    rbtn_3.setChecked(False)
+    rbtn_4.setChecked(False)
+    RadioGroup.setExclusive(True)
