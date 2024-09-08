@@ -75,7 +75,34 @@ class AnswerCheck(QuestionView):
             self.showed_answer.setText(self.frm_model.answer)
             self.frm_model.got_wrong()
 
-#class QuestionListModel(QAbstractListModel):
-    #def
-
-        
+class QuestionListModel(QAbstractListModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.from_list = []
+    
+    def rowCount(self, index):
+        return len(self.from_list)
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            form = self.from_list[index.row()]
+            return form.question
+    def insertRows(self, parent=QModelIndex()):
+        position = len(self.form_list)
+        self.beginInsertRows(parent, position, position)
+        self.endInsertRows()
+        QModelIndex()
+        return True
+    def removeRows(self, position, parent=QModelIndex()):
+        self.beginRemoveRows(parent, position, position)
+        self.form_list.pop(position)
+        self.endRemoveRows()
+        return True
+    def random_question(self):
+        total = len(self.form_list)
+        current = randint(0, total - 1)
+        return self.form_list[current]
+    def random_AnswerCheck(list_model, w_question, widgets_list, w_showed_answer, w_result):
+        frm = list_model.random_question()
+        shuffle(widgets_list)
+        frm_card = AnswerCheck(frm, w_question, widgets_list[0], widgets_list[1], widgets_list[2], widgets_list[3], w_showed_answer, w_result)
+        return frm_card
