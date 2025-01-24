@@ -1,5 +1,7 @@
 from pygame import *
 import random
+
+
 mixer.init()
 
 screen = display.set_mode((1000, 1080))
@@ -13,6 +15,11 @@ win_width = 1000
 win_height = 1080
 Fumo_spawn_y = -65
 allbullets = []
+last_shoot_time = 0
+shoot_delay = 100
+
+last_hit_time = 0
+hit_delay = 100
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, playerX, playerY, player_speed):
@@ -32,6 +39,11 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     def update(self):
+        global last_shoot_time
+        global shoot_delay
+        current_time = time.get_ticks()
+        
+        
         keys = key.get_pressed()
         if keys[K_LEFT] and self.rect.x > 5:
             self.rect.x -= self.speed
@@ -42,10 +54,11 @@ class Player(GameSprite):
         if keys[K_DOWN] and self.rect.y < win_height - 65:
             self.rect.y += self.speed
         
-        if keys[K_e]:
+        if keys[K_e] and current_time - last_shoot_time >= shoot_delay:
+            
             Bullet.create_bullet(self, allbullets)
+            last_shoot_time = current_time
 
-    
         
 
 class Bullet(sprite.Sprite):
@@ -60,6 +73,7 @@ class Bullet(sprite.Sprite):
         self.rect.x = wall_x
         self.rect.y = wall_y
         self.speed = speed
+        
 
     def draw_bullet(self):
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -69,8 +83,7 @@ class Bullet(sprite.Sprite):
     def create_bullet(self, allbullets):
         bullet = Bullet("green", Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 15, 15, 2)
         allbullets.append(bullet)
-        print(allbullets)
-        
+
     def update(self):
         if self.rect.y >= win_height - 20:
             self.direction = "up"
@@ -104,15 +117,19 @@ Fumo_destroyer = Player('Fumo Hero/kostichka.jpg', (win_width / 2) - 65, win_hei
 Bad_Fumo = Enemy('Fumo Hero/Cirno9.webp', (win_width / 2) -50, 0, 1)
 
 clock = time.Clock()
-FPS = 144
+frames = 144
 
 finish = False
 running = True
+can_shoot = True
 while running:
+    current_time = time.get_ticks()
     for e in event.get():
         if e.type == QUIT:
             running = False
-
+        elif type == KEYUP:  # Проверяем, когда клавиша отпущена
+            if event.key == K_e:
+                can_shoot = True
     if finish != True:
         screen.blit(background, (0, 0))
         Fumo_destroyer.update()
@@ -122,7 +139,21 @@ while running:
         Bad_Fumo.reset()
         for i in allbullets:
             i.draw_bullet()
+            if i.rect.y < 0:
+                allbullets.remove(i)
             i.update()
+            if sprite.collide_rect(i, Bad_Fumo):
+                if current_time - last_hit_time >= hit_delay:
+                    last_hit_time = current_time
+                    print("HIT!!!")
+
+# Calculate the start time
+
+
+# Code here
+
+# Calculate the end time and time taken
+
 
     display.update()
-    clock.tick(FPS)
+    clock.tick(frames)
