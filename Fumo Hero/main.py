@@ -12,6 +12,7 @@ screen.blit(background, (0, 0))
 win_width = 1000
 win_height = 1080
 Fumo_spawn_y = -65
+allbullets = []
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, playerX, playerY, player_speed):
@@ -34,18 +35,18 @@ class Player(GameSprite):
         keys = key.get_pressed()
         if keys[K_LEFT] and self.rect.x > 5:
             self.rect.x -= self.speed
-        if keys[K_RIGHT] and self.rect.x < win_width:
+        if keys[K_RIGHT] and self.rect.x < win_width - 65:
             self.rect.x += self.speed
         if keys[K_UP] and self.rect.y > 5:
             self.rect.y -= self.speed
-        if keys[K_DOWN] and self.rect.y < win_height:
+        if keys[K_DOWN] and self.rect.y < win_height - 65:
             self.rect.y += self.speed
-
-    def shoot(self):
-        keys = key.get_pressed()
+        
         if keys[K_e]:
-            bullet = Bullet("green", Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 15, 15, 2)
-            
+            Bullet.create_bullet(self, allbullets)
+
+    
+        
 
 class Bullet(sprite.Sprite):
     def __init__(self, color, wall_x, wall_y, wall_width, wall_height, speed):
@@ -60,17 +61,23 @@ class Bullet(sprite.Sprite):
         self.rect.y = wall_y
         self.speed = speed
 
-    def draw_wall(self):
+    def draw_bullet(self):
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
     direction = "up"
 
+    def create_bullet(self, allbullets):
+        bullet = Bullet("green", Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 15, 15, 2)
+        allbullets.append(bullet)
+        print(allbullets)
+        
     def update(self):
         if self.rect.y >= win_height - 20:
             self.direction = "up"
     
         if self.direction == "up":
-            self.rect.y += self.speed
+            self.rect.y -= self.speed
+
 
 
 class Enemy(GameSprite):
@@ -110,11 +117,12 @@ while running:
         screen.blit(background, (0, 0))
         Fumo_destroyer.update()
         Bad_Fumo.update()
-        #bullet.update()
-        #bullet.reset()
 
         Fumo_destroyer.reset()
         Bad_Fumo.reset()
-    
+        for i in allbullets:
+            i.draw_bullet()
+            i.update()
+
     display.update()
     clock.tick(FPS)
