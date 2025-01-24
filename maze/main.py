@@ -5,7 +5,7 @@ screen = display.set_mode((1000, 700))
 
 display.set_caption("Cool Maze")
 
-background = transform.scale(image.load("field.jpg"), (1000, 700))
+background = transform.scale(image.load("maze/field.jpg"), (1000, 700))
 
 screen.blit(background, (0, 0))
 
@@ -72,9 +72,9 @@ class Wall(sprite.Sprite):
 win_width = 1200
 win_height = 700
 
-player = Player('kostichka.jpg', 5, win_height - 80, 4)
-monster = Enemy('spider.png', win_width - 80, 280, 2)
-final = GameSprite('big booty black man.webp', win_width - 120, win_height - 80, 0)
+player = Player('maze/kostichka.jpg', 5, win_height - 80, 4)
+monster = Enemy('maze/spider.png', win_width - 80, 280, 2)
+final = GameSprite('maze/big booty black man.webp', win_width - 120, win_height - 80, 0)
 wall1 = Wall(20, 20, 20, 250, 0, 50, 400)
 wall2 = Wall(20, 20, 20, 400, 220, 300, 50)
 wall3 = Wall(20, 20, 20, 400, 350, 220, 50)
