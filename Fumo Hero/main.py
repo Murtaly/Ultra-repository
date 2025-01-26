@@ -1,7 +1,5 @@
 from pygame import *
 import random
-
-
 mixer.init()
 
 screen = display.set_mode((1000, 1080))
@@ -20,6 +18,8 @@ shoot_delay = 100
 
 last_hit_time = 0
 hit_delay = 100
+
+baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, playerX, playerY, player_speed):
@@ -62,7 +62,7 @@ class Player(GameSprite):
         
 
 class Bullet(sprite.Sprite):
-    def __init__(self, color, wall_x, wall_y, wall_width, wall_height, speed):
+    def __init__(self, color, bullet_x, bullet_y, wall_width, wall_height, speed):
         super().__init__()
         self.color = color
         self.width = wall_width
@@ -70,8 +70,8 @@ class Bullet(sprite.Sprite):
         self.image = Surface((self.width, self.height))
         self.image.fill((color))
         self.rect = self.image.get_rect()
-        self.rect.x = wall_x
-        self.rect.y = wall_y
+        self.rect.x = bullet_x
+        self.rect.y = bullet_y
         self.speed = speed
         
 
@@ -81,7 +81,7 @@ class Bullet(sprite.Sprite):
     direction = "up"
 
     def create_bullet(self, allbullets):
-        bullet = Bullet("green", Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 15, 15, 2)
+        bullet = Bullet("green", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 15, 15, 2)
         allbullets.append(bullet)
 
     def update(self):
@@ -127,7 +127,7 @@ while running:
     for e in event.get():
         if e.type == QUIT:
             running = False
-        elif type == KEYUP:  # Проверяем, когда клавиша отпущена
+        elif type == KEYUP:
             if event.key == K_e:
                 can_shoot = True
     if finish != True:
@@ -143,16 +143,11 @@ while running:
                 allbullets.remove(i)
             i.update()
             if sprite.collide_rect(i, Bad_Fumo):
+                allbullets.remove(i)
                 if current_time - last_hit_time >= hit_delay:
                     last_hit_time = current_time
-                    print("HIT!!!")
-
-# Calculate the start time
-
-
-# Code here
-
-# Calculate the end time and time taken
+                    mixer.Sound.play(baka)
+                    
 
 
     display.update()
