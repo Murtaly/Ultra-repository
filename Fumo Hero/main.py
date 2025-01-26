@@ -5,7 +5,7 @@ mixer.init()
 screen = display.set_mode((1000, 1080))
 display.set_caption("Fumo Hero")
 
-background = transform.scale(image.load("Fumo Hero/background_space.jpg"), (1000, 1080))
+background = transform.scale(image.load("background_space.jpg"), (1000, 1080))
 
 screen.blit(background, (0, 0))
 
@@ -19,7 +19,7 @@ shoot_delay = 100
 last_hit_time = 0
 hit_delay = 100
 
-baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
+baka = mixer.Sound("baka-cirno.mp3")
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, playerX, playerY, player_speed):
@@ -113,8 +113,8 @@ class Enemy(GameSprite):
             
 
 
-Fumo_destroyer = Player('Fumo Hero/kostichka.jpg', (win_width / 2) - 65, win_height - 160, 4)
-Bad_Fumo = Enemy('Fumo Hero/Cirno9.webp', (win_width / 2) -50, 0, 1)
+Fumo_destroyer = Player('kostichka.jpg', (win_width / 2) - 65, win_height - 160, 4)
+Bad_Fumo = Enemy('Cirno9.webp', (win_width / 2) -50, 0, 1)
 
 clock = time.Clock()
 frames = 144
