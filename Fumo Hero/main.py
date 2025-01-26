@@ -5,7 +5,7 @@ mixer.init()
 screen = display.set_mode((1000, 1080))
 display.set_caption("Fumo Hero")
 
-background = transform.scale(image.load("background_space.jpg"), (1000, 1080))
+background = transform.scale(image.load("Fumo Hero/background_space.jpg"), (1000, 1080))
 
 screen.blit(background, (0, 0))
 
@@ -19,9 +19,9 @@ shoot_delay = 100
 last_hit_time = 0
 hit_delay = 100
 
-baka = mixer.Sound("baka-cirno.mp3")
+baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
-class GameSprite(sprite.Sprite):
+class GameSprite(sprite.Sprite):    
     def __init__(self, player_image, playerX, playerY, player_speed):
         super().__init__()
         self.image = transform.scale(image.load(player_image), (65, 65))
@@ -38,6 +38,7 @@ class GameSprite(sprite.Sprite):
         screen.blit(Fumo_destroyer, (self.rect.x, self.rect.y))
 
 class Player(GameSprite):
+    
     def update(self):
         global last_shoot_time
         global shoot_delay
@@ -45,30 +46,24 @@ class Player(GameSprite):
         
         
         keys = key.get_pressed()
-        if keys[K_LEFT] and self.rect.x > 5:
+        if keys[K_a] and self.rect.x > 5:
             self.rect.x -= self.speed
-        if keys[K_RIGHT] and self.rect.x < win_width - 65:
+        if keys[K_d] and self.rect.x < win_width - 65:
             self.rect.x += self.speed
-        if keys[K_UP] and self.rect.y > 5:
+        if keys[K_w] and self.rect.y > 5:
             self.rect.y -= self.speed
-        if keys[K_DOWN] and self.rect.y < win_height - 65:
+        if keys[K_s] and self.rect.y < win_height - 65:
             self.rect.y += self.speed
         
-        if keys[K_e] and current_time - last_shoot_time >= shoot_delay:
+        if keys[K_SPACE] and current_time - last_shoot_time >= shoot_delay:
             
             Bullet.create_bullet(self, allbullets)
-            last_shoot_time = current_time
-
-        
+            last_shoot_time = current_time    
 
 class Bullet(sprite.Sprite):
-    def __init__(self, color, bullet_x, bullet_y, wall_width, wall_height, speed):
+    def __init__(self, bullet_image, bullet_x, bullet_y, speed):
         super().__init__()
-        self.color = color
-        self.width = wall_width
-        self.height = wall_height
-        self.image = Surface((self.width, self.height))
-        self.image.fill((color))
+        self.image = transform.scale(image.load(bullet_image), (20, 36))
         self.rect = self.image.get_rect()
         self.rect.x = bullet_x
         self.rect.y = bullet_y
@@ -81,7 +76,7 @@ class Bullet(sprite.Sprite):
     direction = "up"
 
     def create_bullet(self, allbullets):
-        bullet = Bullet("green", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 15, 15, 2)
+        bullet = Bullet("Fumo Hero/Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 2)
         allbullets.append(bullet)
 
     def update(self):
@@ -113,8 +108,8 @@ class Enemy(GameSprite):
             
 
 
-Fumo_destroyer = Player('kostichka.jpg', (win_width / 2) - 65, win_height - 160, 4)
-Bad_Fumo = Enemy('Cirno9.webp', (win_width / 2) -50, 0, 1)
+Fumo_destroyer = Player('Fumo Hero/kostichka.jpg', (win_width / 2) - 65, win_height - 160, 4)
+Bad_Fumo = Enemy('Fumo Hero/Cirno9.webp', (win_width / 2) -50, 0, 1)
 
 clock = time.Clock()
 frames = 144
@@ -128,15 +123,16 @@ while running:
         if e.type == QUIT:
             running = False
         elif type == KEYUP:
-            if event.key == K_e:
+            if event.key == K_SPACE:
                 can_shoot = True
     if finish != True:
         screen.blit(background, (0, 0))
-        Fumo_destroyer.update()
-        Bad_Fumo.update()
-
         Fumo_destroyer.reset()
+        Fumo_destroyer.update()
         Bad_Fumo.reset()
+        Bad_Fumo.update()
+        
+
         for i in allbullets:
             i.draw_bullet()
             if i.rect.y < 0:
