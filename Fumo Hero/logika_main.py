@@ -47,10 +47,22 @@ class Player(GameSprite):
     counter_idle = 0
     counter_right = 0
     counter_left = 0
+    health_counter = 3
+
+    Health_image = transform.scale(image.load("Health.png"), (64, 64))
     def update(self):
+        
         global last_shoot_time
         global shoot_delay
         current_time = time.get_ticks()
+
+        if self.health_counter >= 3:
+            screen.blit(self.Health_image, (0, win_height-64))
+        if self.health_counter >= 2:
+            screen.blit(self.Health_image, (64, win_height-64))
+        if self.health_counter >= 1:
+            screen.blit(self.Health_image, (128, win_height-64))
+        
         
         keys = key.get_pressed()
         if keys[K_a] and self.rect.x > 5:
@@ -65,6 +77,11 @@ class Player(GameSprite):
         if keys[K_SPACE] and current_time - last_shoot_time >= shoot_delay:
             Bullet.create_bullet(self, allbullets)
             last_shoot_time = current_time
+        
+        if keys[K_LSHIFT]:
+            self.speed = 1
+        else:
+            self.speed = 4
 
     def idle(self):
         keys = key.get_pressed()
@@ -92,6 +109,17 @@ class Player(GameSprite):
                 
             if self.counter_left >= len(self.cirno_left) - 1:
                 self.counter_left = 0
+    def health(self, health_counter):
+        global running
+        self.health_counter -= 1
+        self.rect.x =(win_width / 2) - 65
+        self.rect.y = win_height - 160
+        if self.health_counter < 0:
+            print("u lose")
+            running = False
+        print(self.health_counter)
+
+            
 
 class Bullet(sprite.Sprite):
     def __init__(self, bullet_image, bullet_x, bullet_y, speed):
@@ -139,16 +167,30 @@ class EnemyBullet(sprite.Sprite):
             self.kill()
 
 class Enemy(GameSprite):
-    direction = "down"
-    shoot_delay = 1000  # Delay between shots
+    direction = "left"
+    shoot_delay = 200  # Delay between shots
     last_shot_time = 0
 
     def update(self):
-        if self.rect.y <= win_height + 70:
-            self.direction = "down"
-
         if self.direction == "down":
             self.rect.y += self.speed
+            if self.rect.y > win_height:
+                self.rect.y = 0
+
+        if self.direction == "left":
+            self.rect.x -= self.speed
+            if self.rect.x < 0:
+                self.rect.x = win_width
+        
+        if self.direction == "right":
+            self.rect.x += self.speed
+            if self.rect.x > win_width:
+                self.rect.x = 0
+
+        if self.direction == "up":
+            self.rect.y -= self.speed
+            if self.rect.y < 0:
+                self.rect.y = win_height
 
         if self.rect.y < -70:
             self.rect.y = Fumo_spawn_y
@@ -161,50 +203,49 @@ class Enemy(GameSprite):
         # Shooting logic
         current_time = time.get_ticks()
         if current_time - self.last_shot_time >= self.shoot_delay:
-            self.shoot()
+            self.Cross_pattern()
             self.last_shot_time = current_time
+        
+        
 
-    def shoot(self):
-        ### Cross pattern
-
-        # for angle in [0, 90, 180, 270]:
-        #     bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-        #     enemy_bullets.append(bullet)
+    def Cross_pattern(self):
+        for angle in [0, 90, 180, 270]:
+           bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+           enemy_bullets.append(bullet)
 
         # Additional patterns can be added here
         # Example: Circle pattern
 
-        ### Spiral pattern
-
-        # num_bullets = 20  # Number of bullets in the spiral
-        # angle_step = 360 / num_bullets  # How much angle to increase for each bullet
+    def Spiral_pattern(self):
+        num_bullets = 20  # Number of bullets in the spiral
+        angle_step = 360 / num_bullets  # How much angle to increase for each bullet
         
-        # for i in range(num_bullets):
-        #     angle = i * angle_step
-        #     bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-        #     enemy_bullets.append(bullet)
+        for i in range(num_bullets):
+            angle = i * angle_step
+            bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+            enemy_bullets.append(bullet)
 
-        #angles = [45, 90, 135]  # Three angles forming a V-shape
-        #for angle in angles:
-        #    bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 3, angle)
-        #    enemy_bullets.append(bullet)
+    def V_shape(self):
+        angles = [45, 90, 135]
+        for angle in angles:
+           bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 3, angle)
+           enemy_bullets.append(bullet)
 
-        ###Laser Beam pattern
+    def Laser_Beam_pattern(self):
+        rows = 3
+        cols = 5
+        bullet_spacing = 50  # Distance between each bullet
 
-        # rows = 3
-        # cols = 5
-        # bullet_spacing = 50  # Distance between each bullet
+        for i in range(rows):
+            for j in range(cols):
+                bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
+                bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
+                bullet = EnemyBullet("Bullet.png", bullet_x, bullet_y, 3,90)
+                enemy_bullets.append(bullet)
 
-        # for i in range(rows):
-        #     for j in range(cols):
-        #         bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
-        #         bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
-        #         bullet = EnemyBullet("Bullet.png", bullet_x, bullet_y, 3,90)
-        #         enemy_bullets.append(bullet)
-
-        # bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
-        # bullet.angle = 90  # Straight down
-        # enemy_bullets.append(bullet)
+        bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
+        bullet.angle = 90  # Straight down
+        enemy_bullets.append(bullet)
 
         ###Wave pattern !NOT WORKING!
 
@@ -231,10 +272,14 @@ Bad_Fumo = Enemy('Cirno9.webp', (win_width / 2) -50, 0, 1)
 clock = time.Clock()
 frames = 144
 
+last_hit_health_time = 0
+hit_health_delay = 2000
+
 finish = False
 running = True
 can_shoot = True
 while running:
+    
     current_time = time.get_ticks()
     for e in event.get():
         if e.type == QUIT:
@@ -266,8 +311,10 @@ while running:
         for bullet in enemy_bullets:
             bullet.draw_bullet()
             bullet.update()
-            if sprite.collide_rect(bullet, Fumo_destroyer):
+            if sprite.collide_rect(bullet, Fumo_destroyer) and current_time - last_hit_health_time >= hit_health_delay:
                 enemy_bullets.remove(bullet)
+                Fumo_destroyer.health(Player.health_counter)
+                last_hit_health_time = current_time
                 # Handle player hit logic here
 
     display.update()
