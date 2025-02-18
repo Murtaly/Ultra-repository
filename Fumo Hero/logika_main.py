@@ -25,14 +25,14 @@ hit_delay = 100
 baka = mixer.Sound("baka-cirno.mp3")
 
 class GameSprite(sprite.Sprite):    
-    def __init__(self, player_image, playerX, playerY, player_speed):
+    def __init__(self, player_image, playerX, playerY, player_speed, width, heigth):
         super().__init__()
-        self.image = transform.scale(image.load(player_image), (65, 65))
+        self.image = transform.scale(image.load(player_image), (width, heigth))
         self.speed = player_speed
 
         self.rect = self.image.get_rect()
         self.rect.x = playerX
-        self.rect.y = playerY
+        self.rect.y = playerY 
 
     def reset(self):
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -50,6 +50,7 @@ class Player(GameSprite):
     health_counter = 3
 
     Health_image = transform.scale(image.load("Health.png"), (64, 64))
+
     def update(self):
         
         global last_shoot_time
@@ -136,7 +137,7 @@ class Bullet(sprite.Sprite):
     direction = "up"
 
     def create_bullet(self, allbullets):
-        bullet = Bullet("Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 2)
+        bullet = Bullet("Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 5)
         allbullets.append(bullet)
 
     def update(self):
@@ -168,45 +169,37 @@ class EnemyBullet(sprite.Sprite):
 
 class Enemy(GameSprite):
     direction = "left"
-    shoot_delay = 200  # Delay between shots
+    shoot_delay = 300  # Delay between shots
     last_shot_time = 0
 
     def update(self):
         if self.direction == "down":
             self.rect.y += self.speed
-            if self.rect.y > win_height:
-                self.rect.y = 0
 
         if self.direction == "left":
             self.rect.x -= self.speed
-            if self.rect.x < 0:
-                self.rect.x = win_width
-        
+
         if self.direction == "right":
             self.rect.x += self.speed
-            if self.rect.x > win_width:
-                self.rect.x = 0
+
 
         if self.direction == "up":
             self.rect.y -= self.speed
-            if self.rect.y < 0:
-                self.rect.y = win_height
-
-        if self.rect.y < -70:
-            self.rect.y = Fumo_spawn_y
-            self.rect.x = random.randint(10, 1070)
-            
-        if self.rect.y > win_height:
-            self.rect.y = Fumo_spawn_y
-            self.rect.x = random.randint(10, 1070)
 
         # Shooting logic
         current_time = time.get_ticks()
         if current_time - self.last_shot_time >= self.shoot_delay:
-            self.Cross_pattern()
+            self.V_shape()
             self.last_shot_time = current_time
         
-        
+        self.move_left_right()
+        self.draw_hp_bar(self.max_health, self.enemy_health)
+
+    def move_left_right(self):
+        if self.rect.x > win_width - 200:
+            self.direction = "left"
+        if self.rect.x < 200:
+            self.direction = "right"
 
     def Cross_pattern(self):
         for angle in [0, 90, 180, 270]:
@@ -226,9 +219,9 @@ class Enemy(GameSprite):
             enemy_bullets.append(bullet)
 
     def V_shape(self):
-        angles = [45, 90, 135]
+        angles = [23, 45, 67, 90, 111, 135, 157]
         for angle in angles:
-           bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 3, angle)
+           bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
            enemy_bullets.append(bullet)
 
     def Laser_Beam_pattern(self):
@@ -264,10 +257,23 @@ class Enemy(GameSprite):
         # for bullet in enemy_bullets:
         #     bullet.rect.x += math.sin(time.get_ticks() * bullet.frequency + bullet.offset) * bullet.amplitude
         #     bullet.rect.y += bullet.speed
+    enemy_health = 100
+    max_health = 100
+
+
+    def draw_hp_bar(self, max_health, enemy_health):
+        draw.rect(screen, (255,0,0), (50, 25, win_width - 100, 20))
+        
+        draw.rect(screen, (0,255,0), (50, 25, (enemy_health / max_health) * (win_width - 100), 20))
+    
+    def hp_del(self):
+        self.enemy_health -= 1
         
 
-Fumo_destroyer = Player('Cirno0.png', (win_width / 2) - 65, win_height - 160, 4)
-Bad_Fumo = Enemy('Cirno9.webp', (win_width / 2) -50, 0, 1)
+Fumo_destroyer = Player('Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
+Fumo_destroyer_hitbox = GameSprite('hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
+
+Bad_Fumo = Enemy('Cirno9.webp', (win_width / 2) -50, 64, 2, 64,64)
 
 clock = time.Clock()
 frames = 144
@@ -288,15 +294,18 @@ while running:
             if event.key == K_SPACE:
                 can_shoot = True
     if finish != True:
+        
         screen.blit(background, (0, 0))
         Fumo_destroyer.reset()
+        Fumo_destroyer_hitbox.reset()
         Fumo_destroyer.update()
         Fumo_destroyer.idle()
         Fumo_destroyer.move_right()
         Fumo_destroyer.move_left()
         Bad_Fumo.reset()
         Bad_Fumo.update()
-        
+        Fumo_destroyer_hitbox.rect.x = Fumo_destroyer.rect.x +32
+        Fumo_destroyer_hitbox.rect.y = Fumo_destroyer.rect.y +32
         for i in allbullets:
             i.draw_bullet()
             if i.rect.y < 0:
@@ -306,12 +315,13 @@ while running:
                 allbullets.remove(i)
                 if current_time - last_hit_time >= hit_delay:
                     last_hit_time = current_time
+                    Bad_Fumo.hp_del()
                     mixer.Sound.play(baka)
 
         for bullet in enemy_bullets:
             bullet.draw_bullet()
             bullet.update()
-            if sprite.collide_rect(bullet, Fumo_destroyer) and current_time - last_hit_health_time >= hit_health_delay:
+            if sprite.collide_rect(bullet, Fumo_destroyer_hitbox) and current_time - last_hit_health_time >= hit_health_delay:
                 enemy_bullets.remove(bullet)
                 Fumo_destroyer.health(Player.health_counter)
                 last_hit_health_time = current_time
