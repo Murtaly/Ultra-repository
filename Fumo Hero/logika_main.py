@@ -7,7 +7,7 @@ mixer.init()
 screen = display.set_mode((900, 720))
 display.set_caption("Fumo Hero")
 
-background = transform.scale(image.load("background_space.jpg"), (900, 720))
+background = transform.scale(image.load("Fumo Hero/background_space.jpg"), (900, 720))
 
 screen.blit(background, (0, 0))
 
@@ -22,7 +22,7 @@ shoot_delay = 100
 last_hit_time = 0
 hit_delay = 100
 
-baka = mixer.Sound("baka-cirno.mp3")
+baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
 class GameSprite(sprite.Sprite):    
     def __init__(self, player_image, playerX, playerY, player_speed, width, heigth):
@@ -49,7 +49,7 @@ class Player(GameSprite):
     counter_left = 0
     health_counter = 3
 
-    Health_image = transform.scale(image.load("Health.png"), (64, 64))
+    Health_image = transform.scale(image.load("Fumo Hero/Health.png"), (64, 64))
 
     def update(self):
         
@@ -88,7 +88,7 @@ class Player(GameSprite):
         keys = key.get_pressed()
         if not keys[K_a] and not keys[K_d] and not keys[K_w] and not keys[K_s] and not keys[K_SPACE]:
             self.counter_idle += 0.05
-            self.image = transform.scale(image.load(f"{self.cirno_idle[int(self.counter_idle)]}"), (65, 65))
+            self.image = transform.scale(image.load(f"Fumo Hero/{self.cirno_idle[int(self.counter_idle)]}"), (65, 65))
                 
             if self.counter_idle >= len(self.cirno_idle) - 1:
                 self.counter_idle = 0
@@ -97,7 +97,7 @@ class Player(GameSprite):
         keys = key.get_pressed()
         if keys[K_d]:
             self.counter_right += 0.05
-            self.image = transform.scale(image.load(f"{self.cirno_right[int(self.counter_right)]}"), (65, 65))
+            self.image = transform.scale(image.load(f"Fumo Hero/{self.cirno_right[int(self.counter_right)]}"), (65, 65))
                 
             if self.counter_right >= len(self.cirno_right) - 1:
                 self.counter_right = 0
@@ -106,7 +106,7 @@ class Player(GameSprite):
         keys = key.get_pressed()
         if keys[K_a]:
             self.counter_left += 0.05
-            self.image = transform.scale(image.load(f"{self.cirno_left[int(self.counter_left)]}"), (65, 65))
+            self.image = transform.scale(image.load(f"Fumo Hero/{self.cirno_left[int(self.counter_left)]}"), (65, 65))
                 
             if self.counter_left >= len(self.cirno_left) - 1:
                 self.counter_left = 0
@@ -137,7 +137,7 @@ class Bullet(sprite.Sprite):
     direction = "up"
 
     def create_bullet(self, allbullets):
-        bullet = Bullet("Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 5)
+        bullet = Bullet("Fumo Hero/Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 5)
         allbullets.append(bullet)
 
     def update(self):
@@ -203,7 +203,7 @@ class Enemy(GameSprite):
 
     def Cross_pattern(self):
         for angle in [0, 90, 180, 270]:
-           bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+           bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
            enemy_bullets.append(bullet)
 
         # Additional patterns can be added here
@@ -215,13 +215,13 @@ class Enemy(GameSprite):
         
         for i in range(num_bullets):
             angle = i * angle_step
-            bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+            bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
             enemy_bullets.append(bullet)
 
     def V_shape(self):
         angles = [23, 45, 67, 90, 111, 135, 157]
         for angle in angles:
-           bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+           bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
            enemy_bullets.append(bullet)
 
     def Laser_Beam_pattern(self):
@@ -233,10 +233,10 @@ class Enemy(GameSprite):
             for j in range(cols):
                 bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
                 bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
-                bullet = EnemyBullet("Bullet.png", bullet_x, bullet_y, 3,90)
+                bullet = EnemyBullet("Fumo Hero/Bullet.png", bullet_x, bullet_y, 3,90)
                 enemy_bullets.append(bullet)
 
-        bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
+        bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
         bullet.angle = 90  # Straight down
         enemy_bullets.append(bullet)
 
@@ -270,10 +270,10 @@ class Enemy(GameSprite):
         self.enemy_health -= 1
         
 
-Fumo_destroyer = Player('Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
-Fumo_destroyer_hitbox = GameSprite('hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
+Fumo_destroyer = Player('Fumo Hero/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
+Fumo_destroyer_hitbox = GameSprite('Fumo Hero/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
 
-Bad_Fumo = Enemy('Cirno9.webp', (win_width / 2) -50, 64, 2, 64,64)
+Bad_Fumo = Enemy('Fumo Hero/Cirno9.webp', (win_width / 2) -50, 64, 2, 64,64)
 
 clock = time.Clock()
 frames = 144
