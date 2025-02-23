@@ -153,15 +153,15 @@ class Bullet(sprite.Sprite):
 class EnemyBullet(sprite.Sprite):
     def __init__(self, bullet_image, bullet_x, bullet_y, speed, angle=0):
         super().__init__()
-        self.image = transform.scale(image.load(bullet_image), (20, 20))
-        self.rect = self.image.get_rect()
-        self.rect.x = bullet_x
-        self.rect.y = bullet_y
+        original_image = image.load(bullet_image)
+        self.image = transform.scale(original_image, (20, 36))
+        self.image = transform.rotate(self.image, -angle - 90)  # Поворот на вказаний кут
+        self.rect = self.image.get_rect(center=(bullet_x, bullet_y))
         self.speed = speed
         self.angle = angle
 
     def draw_bullet(self):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        screen.blit(self.image, self.rect.topleft)
 
     def update(self):
         self.rect.x += self.speed * math.cos(math.radians(self.angle))
@@ -194,7 +194,7 @@ class Enemy(GameSprite):
         current_time = time.get_ticks()
         if current_time - self.last_shot_time >= self.shoot_delay:
             
-            self.paterns[self.current_pattern_index](self)
+            self.patterns[self.current_pattern_index](self)
             self.last_shot_time = current_time
         self.draw_hp_bar(self.max_health, self.enemy_health)
 
@@ -204,7 +204,6 @@ class Enemy(GameSprite):
         None
 
     def Bad_fumo_fight(self):
-
 
         if counter_time <= 1000:
             self.current_pattern_index = 0
@@ -263,8 +262,8 @@ class Enemy(GameSprite):
     def V_shape(self):
         angles = [23, 45, 67, 90, 111, 135, 157]
         for angle in angles:
-           bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-           enemy_bullets.append(bullet)
+            bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
+            enemy_bullets.append(bullet)
 
     def Laser_Beam_pattern(self):
         rows = 3
@@ -280,8 +279,7 @@ class Enemy(GameSprite):
 
         bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
         bullet.angle = 90  # Straight down
-        enemy_bullets.append(bullet)
-
+        
         ###Wave pattern !NOT WORKING!
 
         # num_bullets = 10
@@ -299,9 +297,10 @@ class Enemy(GameSprite):
         # for bullet in enemy_bullets:
         #     bullet.rect.x += math.sin(time.get_ticks() * bullet.frequency + bullet.offset) * bullet.amplitude
         #     bullet.rect.y += bullet.speed
+
     enemy_health = 100
     max_health = 100
-    paterns = [V_shape, Cross_pattern,Spiral_pattern,Laser_Beam_pattern, none]
+    patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
         draw.rect(screen, (255,0,0), (50, 25, win_width - 100, 20))
