@@ -2,6 +2,7 @@ from pygame import *
 import random
 import math
 
+
 mixer.init() 
 
 screen = display.set_mode((900, 720))
@@ -21,6 +22,8 @@ shoot_delay = 100
 
 last_hit_time = 0
 hit_delay = 100
+
+counter_time = 0
 
 baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
@@ -171,6 +174,7 @@ class Enemy(GameSprite):
     direction = "left"
     shoot_delay = 300  # Delay between shots
     last_shot_time = 0
+    current_pattern_index = 0
 
     def update(self):
         if self.direction == "down":
@@ -189,17 +193,55 @@ class Enemy(GameSprite):
         # Shooting logic
         current_time = time.get_ticks()
         if current_time - self.last_shot_time >= self.shoot_delay:
-            self.V_shape()
+            
+            self.paterns[self.current_pattern_index](self)
             self.last_shot_time = current_time
-        
-        self.move_left_right()
         self.draw_hp_bar(self.max_health, self.enemy_health)
 
-    def move_left_right(self):
-        if self.rect.x > win_width - 200:
-            self.direction = "left"
-        if self.rect.x < 200:
-            self.direction = "right"
+        self.Bad_fumo_fight()
+
+    def none(self):
+        None
+
+    def Bad_fumo_fight(self):
+
+
+        if counter_time <= 1000:
+            self.current_pattern_index = 0
+            if self.rect.x > win_width - 200:
+                self.direction = "left"
+            if self.rect.x < 200:
+                self.direction = "right"
+        
+        if 1000 <= counter_time <= 1250:
+            self.current_pattern_index = 4
+            self.speed = 0
+            
+        if 1250 <= counter_time <= 2000:
+            self.speed = 2
+            if self.rect.x > win_width - 200:
+                self.current_pattern_index = 3
+                self.direction = "left"
+            if self.rect.x < 200:
+                self.current_pattern_index = 3
+                self.direction = "right"
+
+        if 2000 <= counter_time <= 2250:
+            self.current_pattern_index = 4
+            self.speed = 0
+
+        if 2000 <= counter_time <= 3000:
+            self.speed = 2
+            if self.rect.y > win_height - 100:
+                self.current_pattern_index = 2
+                self.direction = "up"
+            if self.rect.y < 100:
+                self.current_pattern_index = 2
+                self.direction = "down"
+
+        if 3000 <= counter_time <= 3250:
+            self.current_pattern_index = 4
+            self.speed = 0
 
     def Cross_pattern(self):
         for angle in [0, 90, 180, 270]:
@@ -259,7 +301,7 @@ class Enemy(GameSprite):
         #     bullet.rect.y += bullet.speed
     enemy_health = 100
     max_health = 100
-
+    paterns = [V_shape, Cross_pattern,Spiral_pattern,Laser_Beam_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
         draw.rect(screen, (255,0,0), (50, 25, win_width - 100, 20))
@@ -285,7 +327,7 @@ finish = False
 running = True
 can_shoot = True
 while running:
-    
+    counter_time += 1
     current_time = time.get_ticks()
     for e in event.get():
         if e.type == QUIT:
