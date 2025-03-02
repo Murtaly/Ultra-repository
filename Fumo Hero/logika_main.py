@@ -15,8 +15,12 @@ screen.blit(background, (0, 0))
 win_width = 900
 win_height = 720
 Fumo_spawn_y = -65
+
+
 allbullets = []
 enemy_bullets = []
+bombitem = []
+healitem = []
 last_shoot_time = 0
 shoot_delay = 100
 
@@ -52,7 +56,11 @@ class Player(GameSprite):
     counter_left = 0
     health_counter = 3
 
+    bomb_counter = 3
+
     Health_image = transform.scale(image.load("Fumo Hero/Health.png"), (64, 64))
+
+    bomb_image = transform.scale(image.load("Fumo Hero/bomb.png"), (64, 64))
 
     def update(self):
         
@@ -60,12 +68,27 @@ class Player(GameSprite):
         global shoot_delay
         current_time = time.get_ticks()
 
+        if self.health_counter >= 5:
+            screen.blit(self.Health_image, (256, win_height-64))        
+        if self.health_counter >= 4:
+            screen.blit(self.Health_image, (192, win_height-64))
         if self.health_counter >= 3:
-            screen.blit(self.Health_image, (0, win_height-64))
+            screen.blit(self.Health_image, (128, win_height-64))
         if self.health_counter >= 2:
             screen.blit(self.Health_image, (64, win_height-64))
         if self.health_counter >= 1:
-            screen.blit(self.Health_image, (128, win_height-64))
+            screen.blit(self.Health_image, (0, win_height-64))
+        
+        if self.bomb_counter >= 5:
+            screen.blit(self.bomb_image, (win_width - 320, win_height-64))        
+        if self.bomb_counter >= 4:
+            screen.blit(self.bomb_image, (win_width - 256, win_height-64))
+        if self.bomb_counter >= 3:
+            screen.blit(self.bomb_image, (win_width - 192, win_height-64))
+        if self.bomb_counter >= 2:
+            screen.blit(self.bomb_image, (win_width - 128, win_height-64))
+        if self.bomb_counter >= 1:
+            screen.blit(self.bomb_image, (win_width - 64, win_height-64))
         
         
         keys = key.get_pressed()
@@ -78,6 +101,10 @@ class Player(GameSprite):
         if keys[K_s] and self.rect.y < win_height - 65:
             self.rect.y += self.speed
         
+        if keys[K_r] and self.bomb_counter >= 1:
+            self.bomb_counter -= 1
+            enemy_bullets.clear()
+
         if keys[K_SPACE] and current_time - last_shoot_time >= shoot_delay:
             Bullet.create_bullet(self, allbullets)
             last_shoot_time = current_time
@@ -123,7 +150,26 @@ class Player(GameSprite):
             running = False
         print(self.health_counter)
 
+    def bombadd(self):
+        self.bomb_counter += 1
+    def healadd(self):
+        self.health_counter += 1
             
+
+class items(GameSprite):
+    def update(self):
+        self.rect.y += self.speed
+
+
+    def create_item_bomb():
+        bomb_item = items("Fumo Hero/Bomb.png", Bad_Fumo.rect.x + 50, Bad_Fumo.rect.y, 1, 64, 64)
+        bombitem.append(bomb_item)
+
+    def create_item_health():
+        heal_item = items("Fumo Hero/Health.png", Bad_Fumo.rect.x - 50, Bad_Fumo.rect.y, 1, 64, 64)
+        healitem.append(heal_item)
+    
+
 
 class Bullet(sprite.Sprite):
     def __init__(self, bullet_image, bullet_x, bullet_y, speed):
@@ -169,6 +215,7 @@ class EnemyBullet(sprite.Sprite):
 
         if self.rect.y > win_height or self.rect.y < 0 or self.rect.x > win_width or self.rect.x < 0:
             self.kill()
+
 
 class Enemy(GameSprite):
     direction = "left"
@@ -298,8 +345,8 @@ class Enemy(GameSprite):
         #     bullet.rect.x += math.sin(time.get_ticks() * bullet.frequency + bullet.offset) * bullet.amplitude
         #     bullet.rect.y += bullet.speed
 
-    enemy_health = 100
-    max_health = 100
+    enemy_health = 1
+    max_health = 1
     patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
@@ -309,7 +356,7 @@ class Enemy(GameSprite):
     
     def hp_del(self):
         self.enemy_health -= 1
-        
+
 
 Fumo_destroyer = Player('Fumo Hero/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
 Fumo_destroyer_hitbox = GameSprite('Fumo Hero/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
@@ -336,6 +383,12 @@ while running:
                 can_shoot = True
     if finish != True:
         
+        if Bad_Fumo.enemy_health <= 0:
+            items.create_item_bomb()
+            items.create_item_health()
+            Bad_Fumo.rect.x = 10000000
+            
+
         screen.blit(background, (0, 0))
         Fumo_destroyer.reset()
         Fumo_destroyer_hitbox.reset()
@@ -358,6 +411,25 @@ while running:
                     last_hit_time = current_time
                     Bad_Fumo.hp_del()
                     mixer.Sound.play(baka)
+
+        for i in healitem:
+            i.reset()
+            if i.rect.y > win_height:
+                healitem.remove(i)
+            i.update()
+            if sprite.collide_rect(i, Fumo_destroyer):
+                Fumo_destroyer.healadd()
+                healitem.remove(i)
+
+        for i in bombitem:
+            i.reset()
+            if i.rect.y > win_height:
+                bombitem.remove(i)
+            i.update()
+            if sprite.collide_rect(i, Fumo_destroyer):
+                Fumo_destroyer.bombadd()
+                bombitem.remove(i)
+
 
         for bullet in enemy_bullets:
             bullet.draw_bullet()
