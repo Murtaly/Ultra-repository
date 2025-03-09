@@ -100,10 +100,6 @@ class Player(GameSprite):
             self.rect.y -= self.speed
         if keys[K_s] and self.rect.y < win_height - 65:
             self.rect.y += self.speed
-        
-        if keys[K_r] and self.bomb_counter >= 1:
-            self.bomb_counter -= 1
-            enemy_bullets.clear()
 
         if keys[K_SPACE] and current_time - last_shoot_time >= shoot_delay:
             Bullet.create_bullet(self, allbullets)
@@ -113,6 +109,11 @@ class Player(GameSprite):
             self.speed = 1
         else:
             self.speed = 4
+    def use_bomb(self, event):
+        if event.type == KEYDOWN:
+            if event.key == K_r and self.bomb_counter > 0:
+                self.bomb_counter -= 1
+                enemy_bullets.clear()
 
     def idle(self):
         keys = key.get_pressed()
@@ -276,18 +277,15 @@ class Enemy(GameSprite):
             self.current_pattern_index = 4
             self.speed = 0
 
-        if 2000 <= counter_time <= 3000:
+        if 2000 <= counter_time:
             self.speed = 2
-            if self.rect.y > win_height - 100:
+            if self.rect.x > win_width - 200:
                 self.current_pattern_index = 2
-                self.direction = "up"
-            if self.rect.y < 100:
+                self.direction = "left"
+            if self.rect.x < 200:
                 self.current_pattern_index = 2
-                self.direction = "down"
+                self.direction = "right"
 
-        if 3000 <= counter_time <= 3250:
-            self.current_pattern_index = 4
-            self.speed = 0
 
     def Cross_pattern(self):
         for angle in [0, 90, 180, 270]:
@@ -315,7 +313,7 @@ class Enemy(GameSprite):
     def Laser_Beam_pattern(self):
         rows = 3
         cols = 5
-        bullet_spacing = 50  # Distance between each bullet
+        bullet_spacing = 100  # Distance between each bullet
 
         for i in range(rows):
             for j in range(cols):
@@ -327,26 +325,10 @@ class Enemy(GameSprite):
         bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
         bullet.angle = 90  # Straight down
         
-        ###Wave pattern !NOT WORKING!
+       
 
-        # num_bullets = 10
-        # amplitude = 50  # Height of the wave
-        # frequency = 0.2  # How fast the wave oscillates
-
-        # for i in range(num_bullets):
-        #     angle = 90  # Downward direction
-        #     bullet = EnemyBullet("Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-        #     bullet.amplitude = amplitude
-        #     bullet.frequency = frequency
-        #     bullet.offset = i * 30  # Space out the bullets
-        #     enemy_bullets.append(bullet)
-        
-        # for bullet in enemy_bullets:
-        #     bullet.rect.x += math.sin(time.get_ticks() * bullet.frequency + bullet.offset) * bullet.amplitude
-        #     bullet.rect.y += bullet.speed
-
-    enemy_health = 1
-    max_health = 1
+    enemy_health = 100
+    max_health = 100
     patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
@@ -371,16 +353,13 @@ hit_health_delay = 2000
 
 finish = False
 running = True
-can_shoot = True
 while running:
     counter_time += 1
     current_time = time.get_ticks()
     for e in event.get():
         if e.type == QUIT:
             running = False
-        elif type == KEYUP:
-            if event.key == K_SPACE:
-                can_shoot = True
+        Fumo_destroyer.use_bomb(e)
     if finish != True:
         
         if Bad_Fumo.enemy_health <= 0:
