@@ -322,19 +322,58 @@ frames = 144
 last_hit_health_time = 0
 hit_health_delay = 2000
 
-finish = False
+btn_play = GameSprite("Fumo Hero/button_play.png", 192, 80, 0, 320, 132) #transform.scale(image.load("Fumo Hero/button_play.png"), (192, 80))
+
+btn_exit = GameSprite("Fumo Hero/button_exit.png", 192, 280, 0, 320, 132)#transform.scale(image.load("Fumo Hero/button_exit.png"), (192, 80))
+
+btn_settings = GameSprite("Fumo Hero/button_settings.png", 192, 492, 0, 320, 132)#transform.scale(image.load("Fumo Hero/Button_settings.png"), (192, 92))
+
+btn_sound = GameSprite("Fumo Hero/button_sound.png", 192, 280, 0, 150, 140)
+
+
+game = "menu"
 running = True
-can_shoot = True
 while running:
     counter_time += 1
     current_time = time.get_ticks()
     for e in event.get():
         if e.type == QUIT:
             running = False
-        elif type == KEYUP:
-            if event.key == K_SPACE:
-                can_shoot = True
-    if finish != True:
+        if e.type == MOUSEBUTTONDOWN and btn_play.rect.collidepoint(Mouse):
+            game = "game"
+        if e.type == MOUSEBUTTONDOWN and btn_exit.rect.collidepoint(Mouse):
+            print("WEAH")
+        if e.type == MOUSEBUTTONDOWN and btn_settings.rect.collidepoint(Mouse):
+            game = "settings"
+        if e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse):
+            btn_sound = GameSprite("Fumo Hero/button_mute_sound.png", 192, 280, 0, 150, 140)
+
+    if game == "menu":
+        Mouse = mouse.get_pos()
+        btn_play.reset()
+        btn_exit.reset()
+        btn_settings.reset()
+        if btn_play.rect.collidepoint(Mouse):
+            btn_play = GameSprite("Fumo Hero/button_play_pressed.png", 192, 80, 0, 320, 132)
+        elif not btn_play.rect.collidepoint(Mouse):
+            btn_play = GameSprite("Fumo Hero/button_play.png", 192, 80, 0, 320, 132)
+            
+        if btn_exit.rect.collidepoint(Mouse):
+            btn_exit = GameSprite("Fumo Hero/button_exit_pressed.png", 192, 280, 0, 320, 132)
+        elif not btn_exit.rect.collidepoint(Mouse):
+            btn_exit = GameSprite("Fumo Hero/button_exit.png", 192, 280, 0, 320, 132)
+
+        if btn_settings.rect.collidepoint(Mouse):
+            btn_settings = GameSprite("Fumo Hero/button_settings_pressed.png", 192, 492, 0, 320, 132)
+        elif not btn_settings.rect.collidepoint(Mouse):
+            btn_settings = GameSprite("Fumo Hero/button_settings.png", 192, 492, 0, 320, 132)
+
+    if game == "settings":
+        screen.blit(background, (0, 0))
+        btn_sound.reset()
+
+
+    if game == "game":
         
         screen.blit(background, (0, 0))
         Fumo_destroyer.reset()
