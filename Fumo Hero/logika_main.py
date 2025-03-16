@@ -29,6 +29,9 @@ hit_delay = 100
 
 counter_time = 0
 
+mixer.music.load('Fumo Hero/bgm.ogg')
+mixer.music.play()
+
 baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
 class GameSprite(sprite.Sprite):    
@@ -253,18 +256,18 @@ class Enemy(GameSprite):
 
     def Bad_fumo_fight(self):
 
-        if counter_time <= 1000:
+        if self.enemy_health >= 75:
             self.current_pattern_index = 0
             if self.rect.x > win_width - 200:
                 self.direction = "left"
             if self.rect.x < 200:
                 self.direction = "right"
         
-        if 1000 <= counter_time <= 1250:
+        if 60 <= self.enemy_health <= 75:
             self.current_pattern_index = 4
             self.speed = 0
             
-        if 1250 <= counter_time <= 2000:
+        if 35 <= self.enemy_health <= 60:
             self.speed = 2
             if self.rect.x > win_width - 200:
                 self.current_pattern_index = 3
@@ -273,11 +276,11 @@ class Enemy(GameSprite):
                 self.current_pattern_index = 3
                 self.direction = "right"
 
-        if 2000 <= counter_time <= 2250:
+        if 20 <= self.enemy_health <= 35:
             self.current_pattern_index = 4
             self.speed = 0
 
-        if 2000 <= counter_time:
+        if 0 <= self.enemy_health <= 20:
             self.speed = 2
             if self.rect.x > win_width - 200:
                 self.current_pattern_index = 2
@@ -296,8 +299,8 @@ class Enemy(GameSprite):
         # Example: Circle pattern
 
     def Spiral_pattern(self):
-        num_bullets = 20  # Number of bullets in the spiral
-        angle_step = 360 / num_bullets  # How much angle to increase for each bullet
+        num_bullets = 10  # Number of bullets in the spiral
+        angle_step = 180 / num_bullets  # How much angle to increase for each bullet
         
         for i in range(num_bullets):
             angle = i * angle_step
@@ -311,8 +314,8 @@ class Enemy(GameSprite):
             enemy_bullets.append(bullet)
 
     def Laser_Beam_pattern(self):
-        rows = 3
-        cols = 5
+        rows = 2
+        cols = 3
         bullet_spacing = 100  # Distance between each bullet
 
         for i in range(rows):
