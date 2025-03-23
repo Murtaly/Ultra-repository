@@ -403,7 +403,8 @@ while running:
             btn_back = GameSprite("Fumo Hero/button_back.png", 5, 10, 0, 320, 132)
 
     if game == "game":
-        
+        if mute == True:
+            mixer.stop()
         screen.blit(background, (0, 0))
         Fumo_destroyer.reset()
         Fumo_destroyer_hitbox.reset()
