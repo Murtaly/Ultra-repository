@@ -15,8 +15,6 @@ screen.blit(background, (0, 0))
 win_width = 900
 win_height = 720
 Fumo_spawn_y = -65
-
-
 allbullets = []
 enemy_bullets = []
 bombitem = []
@@ -29,8 +27,8 @@ hit_delay = 100
 
 counter_time = 0
 
-mixer.music.load('Fumo Hero/bgm.ogg')
-mixer.music.play()
+#mixer.music.load('Fumo Hero/bgm.ogg')
+#mixer.music.play()
 
 baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
@@ -58,12 +56,11 @@ class Player(GameSprite):
     counter_right = 0
     counter_left = 0
     health_counter = 3
-
     bomb_counter = 3
 
     Health_image = transform.scale(image.load("Fumo Hero/Health.png"), (64, 64))
 
-    bomb_image = transform.scale(image.load("Fumo Hero/bomb.png"), (64, 64))
+    bomb_image = transform.scale(image.load("Fumo Hero/kostichka.jpg"), (64, 64))
 
     def update(self):
         
@@ -85,13 +82,13 @@ class Player(GameSprite):
         if self.bomb_counter >= 5:
             screen.blit(self.bomb_image, (win_width - 320, win_height-64))        
         if self.bomb_counter >= 4:
-            screen.blit(self.bomb_image, (win_width - 256, win_height-64))
+                screen.blit(self.bomb_image, (win_width - 256, win_height-64))
         if self.bomb_counter >= 3:
-            screen.blit(self.bomb_image, (win_width - 192, win_height-64))
+                screen.blit(self.bomb_image, (win_width - 192, win_height-64))
         if self.bomb_counter >= 2:
-            screen.blit(self.bomb_image, (win_width - 128, win_height-64))
+                screen.blit(self.bomb_image, (win_width - 128, win_height-64))
         if self.bomb_counter >= 1:
-            screen.blit(self.bomb_image, (win_width - 64, win_height-64))
+                screen.blit(self.bomb_image, (win_width - 64, win_height-64))
         
         
         keys = key.get_pressed()
@@ -103,7 +100,7 @@ class Player(GameSprite):
             self.rect.y -= self.speed
         if keys[K_s] and self.rect.y < win_height - 65:
             self.rect.y += self.speed
-
+        
         if keys[K_SPACE] and current_time - last_shoot_time >= shoot_delay:
             Bullet.create_bullet(self, allbullets)
             last_shoot_time = current_time
@@ -112,6 +109,7 @@ class Player(GameSprite):
             self.speed = 1
         else:
             self.speed = 4
+
     def use_bomb(self, event):
         if event.type == KEYDOWN:
             if event.key == K_r and self.bomb_counter > 0:
@@ -150,15 +148,14 @@ class Player(GameSprite):
         self.rect.x =(win_width / 2) - 65
         self.rect.y = win_height - 160
         if self.health_counter < 0:
-            print("u lose")
             running = False
-        print(self.health_counter)
+
 
     def bombadd(self):
         self.bomb_counter += 1
     def healadd(self):
         self.health_counter += 1
-            
+
 
 class items(GameSprite):
     def update(self):
@@ -171,8 +168,7 @@ class items(GameSprite):
 
     def create_item_health():
         heal_item = items("Fumo Hero/Health.png", Bad_Fumo.rect.x - 50, Bad_Fumo.rect.y, 1, 64, 64)
-        healitem.append(heal_item)
-    
+        healitem.append(heal_item)      
 
 
 class Bullet(sprite.Sprite):
@@ -219,7 +215,6 @@ class EnemyBullet(sprite.Sprite):
 
         if self.rect.y > win_height or self.rect.y < 0 or self.rect.x > win_width or self.rect.x < 0:
             self.kill()
-
 
 class Enemy(GameSprite):
     direction = "left"
@@ -343,6 +338,19 @@ class Enemy(GameSprite):
         self.enemy_health -= 1
 
 
+    enemy_health = 100
+    max_health = 100
+    patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
+
+    def draw_hp_bar(self, max_health, enemy_health):
+        draw.rect(screen, (255,0,0), (50, 25, win_width - 100, 20))
+        
+        draw.rect(screen, (0,255,0), (50, 25, (enemy_health / max_health) * (win_width - 100), 20))
+    
+    def hp_del(self):
+        self.enemy_health -= 1
+        
+
 Fumo_destroyer = Player('Fumo Hero/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
 Fumo_destroyer_hitbox = GameSprite('Fumo Hero/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
 
@@ -354,23 +362,92 @@ frames = 144
 last_hit_health_time = 0
 hit_health_delay = 2000
 
-finish = False
+btn_play = GameSprite("Fumo Hero/button_play.png", 260, 80, 0, 320, 132) #transform.scale(image.load("Fumo Hero/button_play.png"), (192, 80))
+
+btn_exit = GameSprite("Fumo Hero/button_exit.png", 260, 280, 0, 320, 132)#transform.scale(image.load("Fumo Hero/button_exit.png"), (192, 80))
+
+btn_settings = GameSprite("Fumo Hero/button_settings.png", 260, 492, 0, 320, 132)#transform.scale(image.load("Fumo Hero/Button_settings.png"), (192, 92))
+
+btn_sound = GameSprite("Fumo Hero/button_sound.png", 102, 280, 0, 150, 140)
+
+btn_back = GameSprite("Fumo Hero/button_back.png", 5, 10, 0, 320, 132)
+
+
+game = "menu"
 running = True
+mute = False
 while running:
     counter_time += 1
     current_time = time.get_ticks()
+
     for e in event.get():
         if e.type == QUIT:
             running = False
         Fumo_destroyer.use_bomb(e)
-    if finish != True:
-        
+        if e.type == MOUSEBUTTONDOWN and btn_play.rect.collidepoint(Mouse):
+            game = "game"
+
+        if e.type == MOUSEBUTTONDOWN and btn_exit.rect.collidepoint(Mouse):
+            running = False
+
+        if e.type == MOUSEBUTTONDOWN and btn_settings.rect.collidepoint(Mouse):
+            game = "settings"
+
+        if e.type == MOUSEBUTTONDOWN and btn_back.rect.collidepoint(Mouse):
+            game = "menu"
+
+        if e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == False:
+            btn_sound = GameSprite("Fumo Hero/button_mute_sound.png", 102, 280, 0, 150, 140)
+            mute = True
+
+        elif e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == True:
+            btn_sound = GameSprite("Fumo Hero/button_sound.png", 102, 280, 0, 150, 140)
+            mute = False
+
+
+    if game == "menu":
+        btn_back.kill()
+        btn_sound.kill()
+        Mouse = mouse.get_pos()
+        screen.blit(background, (0,0))
+        btn_play.reset()
+        btn_exit.reset()
+        btn_settings.reset()
+        if btn_play.rect.collidepoint(Mouse):
+            btn_play = GameSprite("Fumo Hero/button_play_pressed.png", 260, 80, 0, 320, 132)
+        elif not btn_play.rect.collidepoint(Mouse):
+            btn_play = GameSprite("Fumo Hero/button_play.png", 260, 80, 0, 320, 132)
+            
+        if btn_exit.rect.collidepoint(Mouse):
+            btn_exit = GameSprite("Fumo Hero/button_exit_pressed.png", 260, 280, 0, 320, 132)
+        elif not btn_exit.rect.collidepoint(Mouse):
+            btn_exit = GameSprite("Fumo Hero/button_exit.png", 260, 280, 0, 320, 132)
+
+        if btn_settings.rect.collidepoint(Mouse):
+            btn_settings = GameSprite("Fumo Hero/button_settings_pressed.png", 260, 492, 0, 320, 132)
+        elif not btn_settings.rect.collidepoint(Mouse):
+            btn_settings = GameSprite("Fumo Hero/button_settings.png", 260, 492, 0, 320, 132)
+
+    if game == "settings":
+        btn_play.kill()
+        btn_exit.kill()
+        btn_settings.kill() 
+        Mouse = mouse.get_pos()
+        screen.blit(background, (0, 0))
+        btn_sound.reset()
+        btn_back.reset()
+        if btn_back.rect.collidepoint(Mouse):
+            btn_back = GameSprite("Fumo Hero/button_back_pressed.png", 5, 10, 0, 320, 132)
+        elif not btn_back.rect.collidepoint(Mouse):
+            btn_back = GameSprite("Fumo Hero/button_back.png", 5, 10, 0, 320, 132)
+
+    if game == "game":
+        if mute == True:
+            mixer.stop()
         if Bad_Fumo.enemy_health <= 0:
             items.create_item_bomb()
             items.create_item_health()
             Bad_Fumo.rect.x = 10000000
-            
-
         screen.blit(background, (0, 0))
         Fumo_destroyer.reset()
         Fumo_destroyer_hitbox.reset()
@@ -393,11 +470,11 @@ while running:
                     last_hit_time = current_time
                     Bad_Fumo.hp_del()
                     mixer.Sound.play(baka)
-
+        
         for i in healitem:
             i.reset()
             if i.rect.y > win_height:
-                healitem.remove(i)
+                 healitem.remove(i)
             i.update()
             if sprite.collide_rect(i, Fumo_destroyer):
                 Fumo_destroyer.healadd()
@@ -411,7 +488,6 @@ while running:
             if sprite.collide_rect(i, Fumo_destroyer):
                 Fumo_destroyer.bombadd()
                 bombitem.remove(i)
-
 
         for bullet in enemy_bullets:
             bullet.draw_bullet()
