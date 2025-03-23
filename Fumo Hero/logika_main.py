@@ -27,8 +27,8 @@ hit_delay = 100
 
 counter_time = 0
 
-mixer.music.load('Fumo Hero/bgm.ogg')
-mixer.music.play()
+#mixer.music.load('Fumo Hero/bgm.ogg')
+#mixer.music.play()
 
 baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
@@ -60,7 +60,7 @@ class Player(GameSprite):
 
     Health_image = transform.scale(image.load("Fumo Hero/Health.png"), (64, 64))
 
-    bomb_image = transform.scale(image.load("Fumo Hero/bomb.png"), (64, 64))
+    bomb_image = transform.scale(image.load("Fumo Hero/kostichka.jpg"), (64, 64))
 
     def update(self):
         
@@ -217,15 +217,27 @@ class EnemyBullet(sprite.Sprite):
             self.kill()
 
 class Enemy(GameSprite):
-    
-    def __init__(self, player_image, playerX, playerY, player_speed, width, heigth, enemy_health, max_health = 100):
-        super().__init__(player_image, playerX, playerY, player_speed, width, heigth)
-        self.direction = "left"
-        self.shoot_delay = 300  # Delay between shots
-        self.last_shot_time = 0
-        self.current_pattern_index = 0
-        self.enemy_health = enemy_health
-        self.max_health = max_health
+    direction = "left"
+    shoot_delay = 300  # Delay between shots
+    last_shot_time = 0
+    current_pattern_index = 0
+    counter_idle = 0
+    sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
+    sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
+
+    def idle(self):
+        self.counter_idle += 0.05
+        self.image = transform.scale(image.load(f"Fumo Hero/{self.sakuya_idle[int(self.counter_idle)]}"), (50, 102))
+                
+        if self.counter_idle >= len(self.sakuya_idle) - 1:
+            self.counter_idle = 0
+
+    def attack(self):
+        self.counter_idle += 0.05
+        self.image = transform.scale(image.load(f"Fumo Hero/{self.sakuya_attack[int(self.counter_idle)]}"), (65, 102))
+                
+        if self.counter_idle >= len(self.sakuya_attack) - 1:
+            self.counter_idle = 0
 
     def update(self):
         if self.direction == "down":
@@ -328,6 +340,10 @@ class Enemy(GameSprite):
         bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
         bullet.angle = 90  # Straight down
         
+       
+
+    enemy_health = 100
+    max_health = 100
     patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
@@ -337,6 +353,10 @@ class Enemy(GameSprite):
     
     def hp_del(self):
         self.enemy_health -= 1
+
+
+    enemy_health = 100
+    max_health = 100
     patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
@@ -351,7 +371,7 @@ class Enemy(GameSprite):
 Fumo_destroyer = Player('Fumo Hero/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
 Fumo_destroyer_hitbox = GameSprite('Fumo Hero/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
 
-Bad_Fumo = Enemy('Fumo Hero/Cirno9.webp', (win_width / 2) -50, 64, 2, 64,64, 100, 100)
+Bad_Fumo = Enemy('Fumo Hero/Cirno9.webp', (win_width / 2) -50, 64, 2, 50,102)
 
 clock = time.Clock()
 frames = 144
@@ -376,6 +396,7 @@ mute = False
 while running:
     counter_time += 1
     current_time = time.get_ticks()
+
     for e in event.get():
         if e.type == QUIT:
             running = False
@@ -439,7 +460,7 @@ while running:
 
     if game == "game":
         if mute == True:
-            mixer.music.load("Fumo Hero/baka-cirno.mp3")
+            mixer.stop()
         if Bad_Fumo.enemy_health <= 0:
             items.create_item_bomb()
             items.create_item_health()
@@ -453,6 +474,7 @@ while running:
         Fumo_destroyer.move_left()
         Bad_Fumo.reset()
         Bad_Fumo.update()
+        Bad_Fumo.attack()
         Fumo_destroyer_hitbox.rect.x = Fumo_destroyer.rect.x +32
         Fumo_destroyer_hitbox.rect.y = Fumo_destroyer.rect.y +32
         for i in allbullets:
