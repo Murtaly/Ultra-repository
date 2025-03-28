@@ -8,7 +8,7 @@ mixer.init()
 screen = display.set_mode((900, 720))
 display.set_caption("Fumo Hero")
 
-background = transform.scale(image.load("Fumo Hero/background_space.jpg"), (900, 720))
+background = transform.scale(image.load("Fumo Hero/sprites/background_space.jpg"), (900, 720))
 
 screen.blit(background, (0, 0))
 
@@ -50,17 +50,19 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     cirno_idle = ["Cirno0.png", "Cirno1.png", "Cirno2.png", "Cirno3.png", "Cirno4.png", "Cirno5.png"]
+    cirno_s_attack = ["Cirno_s1.png", "Cirno_s2.png", "Cirno_s3.png", "Cirno_s4.png", "Cirno_s5.png", "Cirno_s6.png", "Cirno_s7.png", "Cirno_s8.png"]
     cirno_right = ["Cirnowalk0.png", "Cirnowalk1.png", "Cirnowalk2.png", "Cirnowalk3.png", "Cirnowalk4.png", "Cirnowalk5.png", "Cirnowalk6.png", "Cirnowalk7.png"]
     cirno_left = ["Cirnowalk_-0.png", "Cirnowalk_-1.png", "Cirnowalk_-2.png", "Cirnowalk_-3.png", "Cirnowalk_-4.png", "Cirnowalk_-5.png", "Cirnowalk_-6.png", "Cirnowalk_-7.png"]
     counter_idle = 0
+    counter_s_attack = 0
     counter_right = 0
     counter_left = 0
-    health_counter = 3
-    bomb_counter = 3
+    health_counter = 100 #3
+    bomb_counter = 115 #3
 
-    Health_image = transform.scale(image.load("Fumo Hero/Health.png"), (64, 64))
+    Health_image = transform.scale(image.load("Fumo Hero/sprites/Health.png"), (64, 64))
 
-    bomb_image = transform.scale(image.load("Fumo Hero/kostichka.jpg"), (64, 64))
+    bomb_image = transform.scale(image.load("Fumo Hero/sprites/kostichka.jpg"), (64, 64))
 
     def update(self):
         
@@ -110,17 +112,29 @@ class Player(GameSprite):
         else:
             self.speed = 4
 
-    def use_bomb(self, event):
-        if event.type == KEYDOWN:
-            if event.key == K_r and self.bomb_counter > 0:
-                self.bomb_counter -= 1
-                enemy_bullets.clear()
+    def use_bomb(self):
+        keys = key.get_pressed()
+        if keys[K_r] and self.bomb_counter > 0:
+            self.counter_s_attack += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.cirno_s_attack[int(self.counter_s_attack)]}"), (65, 65))
+                    
+            if self.counter_s_attack >= len(self.cirno_s_attack) - 1:
+                self.counter_s_attack = 0
+
+            self.bomb_counter -= 1
+            print (self.bomb_counter)
+            enemy_bullets.clear()
+
+        # if event.type == KEYDOWN:
+        #     if event.key == K_r and self.bomb_counter > 0:
+        #         self.bomb_counter -= 1
+        #         enemy_bullets.clear()
 
     def idle(self):
         keys = key.get_pressed()
         if not keys[K_a] and not keys[K_d] and not keys[K_w] and not keys[K_s] and not keys[K_SPACE]:
             self.counter_idle += 0.05
-            self.image = transform.scale(image.load(f"Fumo Hero/{self.cirno_idle[int(self.counter_idle)]}"), (65, 65))
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.cirno_idle[int(self.counter_idle)]}"), (65, 65))
                 
             if self.counter_idle >= len(self.cirno_idle) - 1:
                 self.counter_idle = 0
@@ -129,7 +143,7 @@ class Player(GameSprite):
         keys = key.get_pressed()
         if keys[K_d]:
             self.counter_right += 0.05
-            self.image = transform.scale(image.load(f"Fumo Hero/{self.cirno_right[int(self.counter_right)]}"), (65, 65))
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.cirno_right[int(self.counter_right)]}"), (65, 65))
                 
             if self.counter_right >= len(self.cirno_right) - 1:
                 self.counter_right = 0
@@ -138,7 +152,7 @@ class Player(GameSprite):
         keys = key.get_pressed()
         if keys[K_a]:
             self.counter_left += 0.05
-            self.image = transform.scale(image.load(f"Fumo Hero/{self.cirno_left[int(self.counter_left)]}"), (65, 65))
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.cirno_left[int(self.counter_left)]}"), (65, 65))
                 
             if self.counter_left >= len(self.cirno_left) - 1:
                 self.counter_left = 0
@@ -163,11 +177,11 @@ class items(GameSprite):
 
 
     def create_item_bomb():
-        bomb_item = items("Fumo Hero/Bomb.png", Bad_Fumo.rect.x + 50, Bad_Fumo.rect.y, 1, 64, 64)
+        bomb_item = items("Fumo Hero/sprites/Bomb.png", Bad_Fumo.rect.x + 50, Bad_Fumo.rect.y, 1, 64, 64)
         bombitem.append(bomb_item)
 
     def create_item_health():
-        heal_item = items("Fumo Hero/Health.png", Bad_Fumo.rect.x - 50, Bad_Fumo.rect.y, 1, 64, 64)
+        heal_item = items("Fumo Hero/sprites/Health.png", Bad_Fumo.rect.x - 50, Bad_Fumo.rect.y, 1, 64, 64)
         healitem.append(heal_item)      
 
 
@@ -186,7 +200,7 @@ class Bullet(sprite.Sprite):
     direction = "up"
 
     def create_bullet(self, allbullets):
-        bullet = Bullet("Fumo Hero/Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 5)
+        bullet = Bullet("Fumo Hero/sprites/Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 5)
         allbullets.append(bullet)
 
     def update(self):
@@ -222,22 +236,23 @@ class Enemy(GameSprite):
     last_shot_time = 0
     current_pattern_index = 0
     counter_idle = 0
+    counter_attack = 0
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
 
     def idle(self):
         self.counter_idle += 0.05
-        self.image = transform.scale(image.load(f"Fumo Hero/{self.sakuya_idle[int(self.counter_idle)]}"), (50, 102))
+        self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_idle[int(self.counter_idle)]}"), (50, 102))
                 
         if self.counter_idle >= len(self.sakuya_idle) - 1:
             self.counter_idle = 0
 
     def attack(self):
-        self.counter_idle += 0.05
-        self.image = transform.scale(image.load(f"Fumo Hero/{self.sakuya_attack[int(self.counter_idle)]}"), (65, 102))
+        self.counter_attack += 0.05
+        self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_attack[int(self.counter_attack)]}"), (65, 102))
                 
-        if self.counter_idle >= len(self.sakuya_attack) - 1:
-            self.counter_idle = 0
+        if self.counter_attack >= len(self.sakuya_attack) - 1:
+            self.counter_attack = 0
 
     def update(self):
         if self.direction == "down":
@@ -269,6 +284,7 @@ class Enemy(GameSprite):
     def Bad_fumo_fight(self):
 
         if self.enemy_health >= 75:
+            self.attack()
             self.current_pattern_index = 0
             if self.rect.x > win_width - 200:
                 self.direction = "left"
@@ -276,10 +292,12 @@ class Enemy(GameSprite):
                 self.direction = "right"
         
         if 60 <= self.enemy_health <= 75:
+            self.idle()
             self.current_pattern_index = 4
             self.speed = 0
             
         if 35 <= self.enemy_health <= 60:
+            self.attack()
             self.speed = 2
             if self.rect.x > win_width - 200:
                 self.current_pattern_index = 3
@@ -289,10 +307,12 @@ class Enemy(GameSprite):
                 self.direction = "right"
 
         if 20 <= self.enemy_health <= 35:
+            self.idle()
             self.current_pattern_index = 4
             self.speed = 0
 
         if 0 <= self.enemy_health <= 20:
+            self.attack()
             self.speed = 2
             if self.rect.x > win_width - 200:
                 self.current_pattern_index = 2
@@ -304,7 +324,7 @@ class Enemy(GameSprite):
 
     def Cross_pattern(self):
         for angle in [0, 90, 180, 270]:
-           bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+           bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
            enemy_bullets.append(bullet)
 
         # Additional patterns can be added here
@@ -316,13 +336,13 @@ class Enemy(GameSprite):
         
         for i in range(num_bullets):
             angle = i * angle_step
-            bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+            bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
             enemy_bullets.append(bullet)
 
     def V_shape(self):
         angles = [23, 45, 67, 90, 111, 135, 157]
         for angle in angles:
-            bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
+            bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
             enemy_bullets.append(bullet)
 
     def Laser_Beam_pattern(self):
@@ -334,13 +354,13 @@ class Enemy(GameSprite):
             for j in range(cols):
                 bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
                 bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
-                bullet = EnemyBullet("Fumo Hero/Bullet.png", bullet_x, bullet_y, 3,90)
+                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", bullet_x, bullet_y, 3,90)
                 enemy_bullets.append(bullet)
 
-        bullet = EnemyBullet("Fumo Hero/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
+        bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
         bullet.angle = 90  # Straight down
         
-       
+    
 
     enemy_health = 100
     max_health = 100
@@ -368,10 +388,10 @@ class Enemy(GameSprite):
         self.enemy_health -= 1
         
 
-Fumo_destroyer = Player('Fumo Hero/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
-Fumo_destroyer_hitbox = GameSprite('Fumo Hero/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
+Fumo_destroyer = Player('Fumo Hero/sprites/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
+Fumo_destroyer_hitbox = GameSprite('Fumo Hero/sprites/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
 
-Bad_Fumo = Enemy('Fumo Hero/Cirno9.webp', (win_width / 2) -50, 64, 2, 50,102)
+Bad_Fumo = Enemy('Fumo Hero/sprites/Cirno9.webp', (win_width / 2) -50, 64, 2, 50,102)
 
 clock = time.Clock()
 frames = 144
@@ -379,15 +399,15 @@ frames = 144
 last_hit_health_time = 0
 hit_health_delay = 2000
 
-btn_play = GameSprite("Fumo Hero/button_play.png", 260, 80, 0, 320, 132) #transform.scale(image.load("Fumo Hero/button_play.png"), (192, 80))
+btn_play = GameSprite("Fumo Hero/sprites/button_play.png", 260, 80, 0, 320, 132) #transform.scale(image.load("Fumo Hero/button_play.png"), (192, 80))
 
-btn_exit = GameSprite("Fumo Hero/button_exit.png", 260, 280, 0, 320, 132)#transform.scale(image.load("Fumo Hero/button_exit.png"), (192, 80))
+btn_exit = GameSprite("Fumo Hero/sprites/button_exit.png", 260, 280, 0, 320, 132)#transform.scale(image.load("Fumo Hero/button_exit.png"), (192, 80))
 
-btn_settings = GameSprite("Fumo Hero/button_settings.png", 260, 492, 0, 320, 132)#transform.scale(image.load("Fumo Hero/Button_settings.png"), (192, 92))
+btn_settings = GameSprite("Fumo Hero/sprites/button_settings.png", 260, 492, 0, 320, 132)#transform.scale(image.load("Fumo Hero/Button_settings.png"), (192, 92))
 
-btn_sound = GameSprite("Fumo Hero/button_sound.png", 102, 280, 0, 150, 140)
+btn_sound = GameSprite("Fumo Hero/sprites/button_sound.png", 102, 280, 0, 150, 140)
 
-btn_back = GameSprite("Fumo Hero/button_back.png", 5, 10, 0, 320, 132)
+btn_back = GameSprite("Fumo Hero/sprites/button_back.png", 5, 10, 0, 320, 132)
 
 
 game = "menu"
@@ -400,7 +420,6 @@ while running:
     for e in event.get():
         if e.type == QUIT:
             running = False
-        Fumo_destroyer.use_bomb(e)
         if e.type == MOUSEBUTTONDOWN and btn_play.rect.collidepoint(Mouse):
             game = "game"
 
@@ -414,11 +433,11 @@ while running:
             game = "menu"
 
         if e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == False:
-            btn_sound = GameSprite("Fumo Hero/button_mute_sound.png", 102, 280, 0, 150, 140)
+            btn_sound = GameSprite("Fumo Hero/sprites/button_mute_sound.png", 102, 280, 0, 150, 140)
             mute = True
 
         elif e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == True:
-            btn_sound = GameSprite("Fumo Hero/button_sound.png", 102, 280, 0, 150, 140)
+            btn_sound = GameSprite("Fumo Hero/sprites/button_sound.png", 102, 280, 0, 150, 140)
             mute = False
 
 
@@ -431,19 +450,19 @@ while running:
         btn_exit.reset()
         btn_settings.reset()
         if btn_play.rect.collidepoint(Mouse):
-            btn_play = GameSprite("Fumo Hero/button_play_pressed.png", 260, 80, 0, 320, 132)
+            btn_play = GameSprite("Fumo Hero/sprites/button_play_pressed.png", 260, 80, 0, 320, 132)
         elif not btn_play.rect.collidepoint(Mouse):
-            btn_play = GameSprite("Fumo Hero/button_play.png", 260, 80, 0, 320, 132)
+            btn_play = GameSprite("Fumo Hero/sprites/button_play.png", 260, 80, 0, 320, 132)
             
         if btn_exit.rect.collidepoint(Mouse):
-            btn_exit = GameSprite("Fumo Hero/button_exit_pressed.png", 260, 280, 0, 320, 132)
+            btn_exit = GameSprite("Fumo Hero/sprites/button_exit_pressed.png", 260, 280, 0, 320, 132)
         elif not btn_exit.rect.collidepoint(Mouse):
-            btn_exit = GameSprite("Fumo Hero/button_exit.png", 260, 280, 0, 320, 132)
+            btn_exit = GameSprite("Fumo Hero/sprites/button_exit.png", 260, 280, 0, 320, 132)
 
         if btn_settings.rect.collidepoint(Mouse):
-            btn_settings = GameSprite("Fumo Hero/button_settings_pressed.png", 260, 492, 0, 320, 132)
+            btn_settings = GameSprite("Fumo Hero/sprites/button_settings_pressed.png", 260, 492, 0, 320, 132)
         elif not btn_settings.rect.collidepoint(Mouse):
-            btn_settings = GameSprite("Fumo Hero/button_settings.png", 260, 492, 0, 320, 132)
+            btn_settings = GameSprite("Fumo Hero/sprites/button_settings.png", 260, 492, 0, 320, 132)
 
     if game == "settings":
         btn_play.kill()
@@ -454,9 +473,9 @@ while running:
         btn_sound.reset()
         btn_back.reset()
         if btn_back.rect.collidepoint(Mouse):
-            btn_back = GameSprite("Fumo Hero/button_back_pressed.png", 5, 10, 0, 320, 132)
+            btn_back = GameSprite("Fumo Hero/sprites/button_back_pressed.png", 5, 10, 0, 320, 132)
         elif not btn_back.rect.collidepoint(Mouse):
-            btn_back = GameSprite("Fumo Hero/button_back.png", 5, 10, 0, 320, 132)
+            btn_back = GameSprite("Fumo Hero/sprites/button_back.png", 5, 10, 0, 320, 132)
 
     if game == "game":
         if mute == True:
@@ -472,9 +491,9 @@ while running:
         Fumo_destroyer.idle()
         Fumo_destroyer.move_right()
         Fumo_destroyer.move_left()
+        Fumo_destroyer.use_bomb()
         Bad_Fumo.reset()
-        Bad_Fumo.update()
-        Bad_Fumo.attack()
+        Bad_Fumo.update() 
         Fumo_destroyer_hitbox.rect.x = Fumo_destroyer.rect.x +32
         Fumo_destroyer_hitbox.rect.y = Fumo_destroyer.rect.y +32
         for i in allbullets:
