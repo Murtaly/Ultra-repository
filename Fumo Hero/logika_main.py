@@ -214,14 +214,23 @@ class EnemyBullet(sprite.Sprite):
     def __init__(self, bullet_image, bullet_x, bullet_y, speed, angle=0):
         super().__init__()
         original_image = image.load(bullet_image)
-        self.image = transform.scale(original_image, (20, 36))
-        self.image = transform.rotate(self.image, -angle - 90)  # Поворот на вказаний кут
-        self.rect = self.image.get_rect(center=(bullet_x, bullet_y))
+        if Enemy.lvl == 0:
+            self.sakuya_image = transform.scale(original_image, (20, 36))
+            self.sakuya_image = transform.rotate(self.sakuya_image, -angle - 90)  # Поворот на вказаний кут
+            self.rect = self.sakuya_image.get_rect(center=(bullet_x, bullet_y))
+        elif Enemy.lvl == 1:
+            self.marisa_image = transform.scale(original_image, (32, 32))
+            self.marisa_image = transform.rotate(self.marisa_image, -angle - 90)
+            self.rect = self.marisa_image.get_rect(center=(bullet_x, bullet_y))
         self.speed = speed
         self.angle = angle
 
     def draw_bullet(self):
-        screen.blit(self.image, self.rect.topleft)
+        if Enemy.lvl == 0:
+            screen.blit(self.sakuya_image, self.rect.topleft)
+        elif Enemy.lvl == 1:
+            screen.blit(self.marisa_image, self.rect.topleft)
+
 
     def update(self):
         self.rect.x += self.speed * math.cos(math.radians(self.angle))
@@ -239,25 +248,46 @@ class Enemy(GameSprite):
         self.current_pattern_index = 0
         self.enemy_health = enemy_health
         self.max_health = max_health
-        
+    
+    lvl = 1    
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
+    marisa_idle = ["Marisa_idle1.png", "Marisa_idle2.png", "Marisa_idle3.png", "Marisa_idle4.png", "Marisa_idle5.png", "Marisa_idle6.png", "Marisa_idle7.png", "Marisa_idle8.png", "Marisa_idle9.png", "Marisa_idle10.png"]
+    marisa_attack = ["Marisa_attack_2_1.png", "Marisa_attack_2_2.png", "Marisa_attack_2_3.png", "Marisa_attack_2_4.png", "Marisa_attack_2_5.png", "Marisa_attack_2_6.png", "Marisa_attack_2_7.png"]
     counter_attack = 0
     counter_idle = 0
 
     def idle(self):
-        self.counter_idle += 0.05
-        self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_idle[int(self.counter_idle)]}"), (50, 102))
+        if self.lvl == 0:
+            self.counter_idle += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_idle[int(self.counter_idle)]}"), (50, 102))
                 
-        if self.counter_idle >= len(self.sakuya_idle) - 1:
-            self.counter_idle = 0
+            if self.counter_idle >= len(self.sakuya_idle) - 1:
+                self.counter_idle = 0
+
+        elif self.lvl == 1:
+            self.counter_idle += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_idle[int(self.counter_idle)]}"), (57, 100))
+                
+            if self.counter_idle >= len(self.marisa_idle) - 1:
+                self.counter_idle = 0
 
     def attack(self):
-        self.counter_attack += 0.05
-        self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_attack[int(self.counter_attack)]}"), (65, 102))
-                
-        if self.counter_attack >= len(self.sakuya_attack) - 1:
-            self.counter_attack = 0
+        if self.lvl == 0:
+            self.counter_attack += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_attack[int(self.counter_attack)]}"), (65, 102))
+                    
+            if self.counter_attack >= len(self.sakuya_attack) - 1:
+                self.counter_attack = 0
+
+        elif self.lvl == 1:
+            self.counter_attack += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_attack[int(self.counter_attack)]}"), (65, 102))
+                    
+            if self.counter_attack >= len(self.marisa_attack) - 1:
+                self.counter_attack = 0
+        
+
 
     def update(self):
         if self.direction == "down":
@@ -328,9 +358,15 @@ class Enemy(GameSprite):
 
 
     def Cross_pattern(self):
-        for angle in [0, 90, 180, 270]:
-           bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-           enemy_bullets.append(bullet)
+        if Enemy.lvl == 0:
+            for angle in [0, 90, 180, 270]:
+                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+                enemy_bullets.append(bullet)
+        if Enemy.lvl == 1:
+            for angle in [0, 90, 180, 270]:
+                bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+                enemy_bullets.append(bullet)
+
 
         # Additional patterns can be added here
         # Example: Circle pattern
@@ -338,32 +374,51 @@ class Enemy(GameSprite):
     def Spiral_pattern(self):
         num_bullets = 10  # Number of bullets in the spiral
         angle_step = 180 / num_bullets  # How much angle to increase for each bullet
-        
-        for i in range(num_bullets):
-            angle = i * angle_step
-            bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-            enemy_bullets.append(bullet)
+        if Enemy.lvl == 0:
+            for i in range(num_bullets):
+                angle = i * angle_step
+                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+                enemy_bullets.append(bullet)
+        elif Enemy.lvl == 1:
+            for i in range(num_bullets):
+                angle = i * angle_step
+                bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
+                enemy_bullets.append(bullet)
 
     def V_shape(self):
         angles = [23, 45, 67, 90, 111, 135, 157]
-        for angle in angles:
-            bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
-            enemy_bullets.append(bullet)
+        if Enemy.lvl == 0:
+            for angle in angles:
+                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
+                enemy_bullets.append(bullet)
+        elif Enemy.lvl == 1:
+            for angle in angles:
+                bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
+                enemy_bullets.append(bullet)
 
     def Laser_Beam_pattern(self):
         rows = 2
         cols = 3
         bullet_spacing = 100  # Distance between each bullet
+        if Enemy.lvl == 0:
+            for i in range(rows):
+                for j in range(cols):
+                    bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
+                    bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
+                    bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", bullet_x, bullet_y, 3,90)
+                    enemy_bullets.append(bullet)
+            bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
+            bullet.angle = 90  # Straight down
+        if Enemy.lvl == 1:
+            for i in range(rows):
+                for j in range(cols):
+                    bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
+                    bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
+                    bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", bullet_x, bullet_y, 3,90)
+                    enemy_bullets.append(bullet)
 
-        for i in range(rows):
-            for j in range(cols):
-                bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
-                bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
-                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", bullet_x, bullet_y, 3,90)
-                enemy_bullets.append(bullet)
-
-        bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
-        bullet.angle = 90  # Straight down
+            bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
+            bullet.angle = 90  # Straight down
         
 
 
