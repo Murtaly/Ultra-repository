@@ -129,6 +129,7 @@ class Player(GameSprite):
             if e.key == K_r and self.bomb_counter > 0:
                 self.bomb_counter -= 1
                 enemy_bullets.clear()
+
     def idle(self):
         keys = key.get_pressed()
         if not keys[K_a] and not keys[K_d] and not keys[K_w] and not keys[K_s] and not keys[K_SPACE]:
@@ -241,6 +242,8 @@ class Enemy(GameSprite):
         
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
+    counter_attack = 0
+    counter_idle = 0
 
     def idle(self):
         self.counter_idle += 0.05
@@ -393,7 +396,7 @@ class Enemy(GameSprite):
 Fumo_destroyer = Player('Fumo Hero/sprites/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
 Fumo_destroyer_hitbox = GameSprite('Fumo Hero/sprites/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
 
-Bad_Fumo = Enemy('Fumo Hero/sprites/Cirno9.webp', (win_width / 2) -50, 64, 2, 50,102)
+Bad_Fumo = Enemy('Fumo Hero/sprites/Cirno9.webp', (win_width / 2) -50, 64, 2, 50,102, 100)
 
 clock = time.Clock()
 frames = 144
