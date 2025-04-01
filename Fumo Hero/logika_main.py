@@ -27,8 +27,8 @@ hit_delay = 100
 
 counter_time = 0
 
-#mixer.music.load('Fumo Hero/bgm.ogg')
-#mixer.music.play()
+mixer.music.load('Fumo Hero/bgm.ogg')
+mixer.music.play()
 
 baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
 
@@ -57,12 +57,12 @@ class Player(GameSprite):
     counter_s_attack = 0
     counter_right = 0
     counter_left = 0
-    health_counter = 100 #3
-    bomb_counter = 115 #3
+    health_counter = 3 #3
+    bomb_counter = 3 #3
 
     Health_image = transform.scale(image.load("Fumo Hero/sprites/Health.png"), (64, 64))
 
-    bomb_image = transform.scale(image.load("Fumo Hero/sprites/kostichka.jpg"), (64, 64))
+    bomb_image = transform.scale(image.load("Fumo Hero/sprites/bomb.png"), (64, 64))
 
     def update(self):
         
@@ -113,23 +113,22 @@ class Player(GameSprite):
             self.speed = 4
 
     def use_bomb(self):
-        keys = key.get_pressed()
-        if keys[K_r] and self.bomb_counter > 0:
-            self.counter_s_attack += 0.05
-            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.cirno_s_attack[int(self.counter_s_attack)]}"), (65, 65))
+        # keys = key.get_pressed()
+        # if keys[K_r] and self.bomb_counter > 0:
+        #     self.counter_s_attack += 0.05
+        #     self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.cirno_s_attack[int(self.counter_s_attack)]}"), (65, 65))
                     
-            if self.counter_s_attack >= len(self.cirno_s_attack) - 1:
-                self.counter_s_attack = 0
+        #     if self.counter_s_attack >= len(self.cirno_s_attack) - 1:
+        #         self.counter_s_attack = 0
 
-            self.bomb_counter -= 1
-            print (self.bomb_counter)
-            enemy_bullets.clear()
+        #     self.bomb_counter -= 1
+        #     print (self.bomb_counter)
+        #     enemy_bullets.clear()
 
-        # if event.type == KEYDOWN:
-        #     if event.key == K_r and self.bomb_counter > 0:
-        #         self.bomb_counter -= 1
-        #         enemy_bullets.clear()
-
+        if e.type == KEYDOWN:
+            if e.key == K_r and self.bomb_counter > 0:
+                self.bomb_counter -= 1
+                enemy_bullets.clear()
     def idle(self):
         keys = key.get_pressed()
         if not keys[K_a] and not keys[K_d] and not keys[K_w] and not keys[K_s] and not keys[K_SPACE]:
@@ -231,12 +230,15 @@ class EnemyBullet(sprite.Sprite):
             self.kill()
 
 class Enemy(GameSprite):
-    direction = "left"
-    shoot_delay = 300  # Delay between shots
-    last_shot_time = 0
-    current_pattern_index = 0
-    counter_idle = 0
-    counter_attack = 0
+    def __init__(self, player_image, playerX, playerY, player_speed, width, heigth, enemy_health, max_health = 100):
+        super().__init__(player_image, playerX, playerY, player_speed, width, heigth)
+        self.direction = "left"
+        self.shoot_delay = 300  # Delay between shots
+        self.last_shot_time = 0
+        self.current_pattern_index = 0
+        self.enemy_health = enemy_health
+        self.max_health = max_health
+        
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
 
@@ -360,7 +362,7 @@ class Enemy(GameSprite):
         bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
         bullet.angle = 90  # Straight down
         
-    
+
 
     enemy_health = 100
     max_health = 100
@@ -418,6 +420,8 @@ while running:
     current_time = time.get_ticks()
 
     for e in event.get():
+        Fumo_destroyer.use_bomb()
+
         if e.type == QUIT:
             running = False
         if e.type == MOUSEBUTTONDOWN and btn_play.rect.collidepoint(Mouse):
@@ -479,7 +483,7 @@ while running:
 
     if game == "game":
         if mute == True:
-            mixer.stop()
+            mixer.music.load("Fumo Hero/baka-cirno.mp3")
         if Bad_Fumo.enemy_health <= 0:
             items.create_item_bomb()
             items.create_item_health()
@@ -491,7 +495,6 @@ while running:
         Fumo_destroyer.idle()
         Fumo_destroyer.move_right()
         Fumo_destroyer.move_left()
-        Fumo_destroyer.use_bomb()
         Bad_Fumo.reset()
         Bad_Fumo.update() 
         Fumo_destroyer_hitbox.rect.x = Fumo_destroyer.rect.x +32
