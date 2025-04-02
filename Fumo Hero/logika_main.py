@@ -2,7 +2,7 @@ from pygame import *
 import random
 import math
 
-
+font.init()
 mixer.init() 
 
 screen = display.set_mode((900, 720))
@@ -12,6 +12,7 @@ background = transform.scale(image.load("Fumo Hero/sprites/background_space.jpg"
 
 screen.blit(background, (0, 0))
 
+game = "menu"
 win_width = 900
 win_height = 720
 Fumo_spawn_y = -65
@@ -19,18 +20,24 @@ allbullets = []
 enemy_bullets = []
 bombitem = []
 healitem = []
+round_over = False
+random_number = random.randint(0, 9)
 last_shoot_time = 0
 shoot_delay = 100
-
+font = font.SysFont("arial", 36)
 last_hit_time = 0
 hit_delay = 100
+music = 'Fumo Hero/sounds/bgm.ogg'
+mixer.music.load(music)
 
+mixer.music.play(-1)
+mixer.music.set_volume(0.5)
 counter_time = 0
 
-mixer.music.load('Fumo Hero/bgm.ogg')
-mixer.music.play()
 
-baka = mixer.Sound("Fumo Hero/baka-cirno.mp3")
+
+
+baka = mixer.Sound("Fumo Hero/sounds/baka-cirno.mp3")
 
 class GameSprite(sprite.Sprite):    
     def __init__(self, player_image, playerX, playerY, player_speed, width, heigth):
@@ -214,25 +221,21 @@ class EnemyBullet(sprite.Sprite):
     def __init__(self, bullet_image, bullet_x, bullet_y, speed, angle=0):
         super().__init__()
         original_image = image.load(bullet_image)
-        if Enemy.lvl == 0:
-            self.sakuya_image = transform.scale(original_image, (20, 36))
-            self.sakuya_image = transform.rotate(self.sakuya_image, -angle - 90)  # Поворот на вказаний кут
-            self.rect = self.sakuya_image.get_rect(center=(bullet_x, bullet_y))
-        elif Enemy.lvl == 1:
-            self.marisa_image = transform.scale(original_image, (32, 32))
-            self.marisa_image = transform.rotate(self.marisa_image, -angle - 90)
-            self.rect = self.marisa_image.get_rect(center=(bullet_x, bullet_y))
+        
+        self.enemy_image = transform.scale(original_image, Enemy.size)
+        self.enemy_image = transform.rotate(self.enemy_image, -angle - 90)  # Поворот на вказаний кут
+        self.rect = self.enemy_image.get_rect(center=(bullet_x, bullet_y))
         self.speed = speed
         self.angle = angle
 
     def draw_bullet(self):
         if Enemy.lvl == 0:
-            screen.blit(self.sakuya_image, self.rect.topleft)
+            screen.blit(self.enemy_image, self.rect.topleft)
         elif Enemy.lvl == 1:
-            screen.blit(self.marisa_image, self.rect.topleft)
-
+            screen.blit(self.enemy_image, self.rect.topleft)
 
     def update(self):
+
         self.rect.x += self.speed * math.cos(math.radians(self.angle))
         self.rect.y += self.speed * math.sin(math.radians(self.angle))
 
@@ -240,7 +243,7 @@ class EnemyBullet(sprite.Sprite):
             self.kill()
 
 class Enemy(GameSprite):
-    def __init__(self, player_image, playerX, playerY, player_speed, width, heigth, enemy_health, max_health = 100):
+    def __init__(self, player_image, playerX, playerY, player_speed, width, heigth, enemy_health, max_health):
         super().__init__(player_image, playerX, playerY, player_speed, width, heigth)
         self.direction = "left"
         self.shoot_delay = 300  # Delay between shots
@@ -248,8 +251,12 @@ class Enemy(GameSprite):
         self.current_pattern_index = 0
         self.enemy_health = enemy_health
         self.max_health = max_health
-    
-    lvl = 1    
+        self.start_time = None
+        self.end_time = None
+        self.bullet_image = "Fumo Hero/sprites/Bullet.png"
+        
+    size = (20, 36)
+    lvl = 0
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
     marisa_idle = ["Marisa_idle1.png", "Marisa_idle2.png", "Marisa_idle3.png", "Marisa_idle4.png", "Marisa_idle5.png", "Marisa_idle6.png", "Marisa_idle7.png", "Marisa_idle8.png", "Marisa_idle9.png", "Marisa_idle10.png"]
@@ -290,6 +297,30 @@ class Enemy(GameSprite):
 
 
     def update(self):
+        global music
+        global background
+        global game
+        global round_over
+        if Bad_Fumo.enemy_health <= 0 :
+            round_over = True
+            if self.start_time is None:  # Перевіряємо, чи ще не ініціалізовано start_time
+                self.start_time = time.get_ticks()
+            # Викликаємо створення предметів після смерті
+            items.create_item_bomb()
+            items.create_item_health()
+
+            # Встановлюємо позицію боса в "далеко" після його смерті
+            Bad_Fumo.rect.x = 10000000
+
+        if round_over:
+            current_time = time.get_ticks()  # Отримуємо поточний час в мілісекундах
+            elapsed_time = current_time - self.start_time  # Різниця в мілісекундах
+            if elapsed_time >= 5000:
+                self.end_time = time.get_ticks()
+                game = "round_over"
+
+
+        
         if self.direction == "down":
             self.rect.y += self.speed
 
@@ -313,59 +344,68 @@ class Enemy(GameSprite):
 
         self.Bad_fumo_fight()
 
+        if Enemy.lvl == 0:
+            self.bullet_image = "Fumo Hero/sprites/Bullet.png"
+            Enemy.size = (20, 36)
+        if Enemy.lvl == 1:
+            if music == 'Fumo Hero/sounds/Sakuya_music.mp3':
+                background = transform.scale(image.load("Fumo Hero/sprites/Marisa_bg.jpg"), (900, 720))
+                music = 'Fumo Hero/sounds/Marisa_music.mp3'
+                mixer.music.load(music)
+                mixer.music.play(-1)
+                self.bullet_image = "Fumo Hero/sprites/Marisa_bullet.png"
+                Enemy.size = (32, 32) 
+        
     def none(self):
         None
 
     def Bad_fumo_fight(self):
+        global random_number
+        if 110 < self.enemy_health :
+            self.idle()
+            self.current_pattern_index = 10
+            self.direction = "up"
+            if self.rect.y <= 64:
+                self.enemy_health = 100
+                self.direction = "right"
 
-        if self.enemy_health >= 75:
+        elif self.enemy_health <= 100:
             self.attack()
-            self.current_pattern_index = 0
-            if self.rect.x > win_width - 200:
+            self.current_pattern_index = random_number
+            if self.rect.x > win_width - 100:
                 self.direction = "left"
-            if self.rect.x < 200:
+            if self.rect.x < 100:
                 self.direction = "right"
         
         if 60 <= self.enemy_health <= 75:
             self.idle()
-            self.current_pattern_index = 4
+            random_number = random.randint(0, 9)
+            self.current_pattern_index = 10
             self.speed = 0
             
         if 35 <= self.enemy_health <= 60:
             self.attack()
             self.speed = 2
-            if self.rect.x > win_width - 200:
-                self.current_pattern_index = 3
+            self.current_pattern_index = random_number
+            if self.rect.x > win_width - 100:
                 self.direction = "left"
-            if self.rect.x < 200:
-                self.current_pattern_index = 3
+            if self.rect.x < 100:
                 self.direction = "right"
 
         if 20 <= self.enemy_health <= 35:
             self.idle()
-            self.current_pattern_index = 4
+            random_number = random.randint(0, 9)
+            self.current_pattern_index = 10
             self.speed = 0
 
         if 0 <= self.enemy_health <= 20:
             self.attack()
             self.speed = 2
-            if self.rect.x > win_width - 200:
-                self.current_pattern_index = 2
+            self.current_pattern_index = random_number
+            if self.rect.x > win_width - 100:
                 self.direction = "left"
-            if self.rect.x < 200:
-                self.current_pattern_index = 2
+            if self.rect.x < 100:
                 self.direction = "right"
-
-
-    def Cross_pattern(self):
-        if Enemy.lvl == 0:
-            for angle in [0, 90, 180, 270]:
-                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-                enemy_bullets.append(bullet)
-        if Enemy.lvl == 1:
-            for angle in [0, 90, 180, 270]:
-                bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-                enemy_bullets.append(bullet)
 
 
         # Additional patterns can be added here
@@ -374,57 +414,95 @@ class Enemy(GameSprite):
     def Spiral_pattern(self):
         num_bullets = 10  # Number of bullets in the spiral
         angle_step = 180 / num_bullets  # How much angle to increase for each bullet
-        if Enemy.lvl == 0:
-            for i in range(num_bullets):
-                angle = i * angle_step
-                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-                enemy_bullets.append(bullet)
-        elif Enemy.lvl == 1:
-            for i in range(num_bullets):
-                angle = i * angle_step
-                bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.x + 25, self.rect.y + 25, 2, angle)
-                enemy_bullets.append(bullet)
+        for i in range(num_bullets):
+            angle = i * angle_step
+            bullet = EnemyBullet(self.bullet_image, self.rect.x + 25, self.rect.y + 25, 2, angle)
+            enemy_bullets.append(bullet)
+
 
     def V_shape(self):
         angles = [23, 45, 67, 90, 111, 135, 157]
-        if Enemy.lvl == 0:
-            for angle in angles:
-                bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
-                enemy_bullets.append(bullet)
-        elif Enemy.lvl == 1:
-            for angle in angles:
-                bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.centerx, self.rect.centery, 2, angle)
-                enemy_bullets.append(bullet)
+        for angle in angles:
+            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.centery, 2, angle)
+            enemy_bullets.append(bullet)
 
     def Laser_Beam_pattern(self):
         rows = 2
         cols = 3
         bullet_spacing = 100  # Distance between each bullet
-        if Enemy.lvl == 0:
-            for i in range(rows):
-                for j in range(cols):
-                    bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
-                    bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
-                    bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", bullet_x, bullet_y, 3,90)
-                    enemy_bullets.append(bullet)
-            bullet = EnemyBullet("Fumo Hero/sprites/Bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
-            bullet.angle = 90  # Straight down
-        if Enemy.lvl == 1:
-            for i in range(rows):
-                for j in range(cols):
-                    bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
-                    bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
-                    bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", bullet_x, bullet_y, 3,90)
-                    enemy_bullets.append(bullet)
-
-            bullet = EnemyBullet("Fumo Hero/sprites/Marisa_bullet.png", self.rect.x + 25, self.rect.y + 25, 5)
-            bullet.angle = 90  # Straight down
+        for i in range(rows):
+            for j in range(cols):
+                bullet_x = self.rect.x + (j - cols // 2) * bullet_spacing
+                bullet_y = self.rect.y + (i - rows // 2) * bullet_spacing
+                bullet = EnemyBullet(self.bullet_image, bullet_x, bullet_y, 3,90)
+                enemy_bullets.append(bullet)
+        bullet = EnemyBullet(self.bullet_image, self.rect.x + 25, self.rect.y + 25, 5)
+        bullet.angle = 90  # Straight down
         
 
+    def Wave_pattern(self):
+        num_bullets = 5
+        for i in range(num_bullets):
+            angle = 90 + (i * 15 - (num_bullets // 2) * 15)  # Робимо хвилю розширюючою
+            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.centery, 2, angle)
+            enemy_bullets.append(bullet)
 
-    enemy_health = 100
-    max_health = 100
-    patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
+    def Random_Spray_pattern(self):
+        import random
+        num_bullets = 8
+        for _ in range(num_bullets):
+            angle = random.randint(0, 180)  # Випадковий кут
+            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.centery, 2, angle)
+            enemy_bullets.append(bullet)
+
+    def Spiral_Expanding_pattern(self):
+        num_bullets = 20
+        for i in range(num_bullets):
+            angle = (i * 18) % 360  # Обертання на 18 градусів кожного разу
+            speed = 1 + (i / 5)  # Збільшуємо швидкість поступово
+            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.centery, speed, angle)
+            enemy_bullets.append(bullet)
+    def Funnel_pattern(self):
+        num_bullets = 5
+        for i in range(num_bullets):
+            angle = 15 * i
+            distance = 50 + (i * 10)
+            bullet_x = self.rect.centerx + distance * math.cos(math.radians(angle))
+            bullet_y = self.rect.centery + distance * math.sin(math.radians(angle))
+            bullet = EnemyBullet(self.bullet_image, bullet_x, bullet_y, 2, angle)
+            enemy_bullets.append(bullet)
+
+
+    def Diagonal_Rain_pattern(self):
+        num_bullets = 10
+        for i in range(num_bullets):
+            angle = 45 + (i * 10)
+            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.centery, 2, angle)
+            enemy_bullets.append(bullet)
+            angle = 135 + (i * 10)
+            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.centery, 2, angle)
+            enemy_bullets.append(bullet)
+
+    def Explosive_Radial_pattern(self):
+        num_bullets = 16
+        for i in range(num_bullets):
+            angle = (i * 360 / num_bullets)
+            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.centery, 4, angle)
+            enemy_bullets.append(bullet)
+
+    def Concentric_Circles_pattern(self):
+        num_bullets = 10
+        for i in range(3):
+            radius = 30 * (i + 1)
+            for j in range(num_bullets):
+                angle = (j * 360 / num_bullets)
+                bullet_x = self.rect.centerx + radius * math.cos(math.radians(angle))
+                bullet_y = self.rect.centery + radius * math.sin(math.radians(angle))
+                bullet = EnemyBullet(self.bullet_image, bullet_x, bullet_y, 2, angle)
+                enemy_bullets.append(bullet)
+    
+
+    patterns = [V_shape, Spiral_pattern, Laser_Beam_pattern, Wave_pattern, Random_Spray_pattern, Spiral_Expanding_pattern, Funnel_pattern, Diagonal_Rain_pattern, Explosive_Radial_pattern, Concentric_Circles_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
         draw.rect(screen, (255,0,0), (50, 25, win_width - 100, 20))
@@ -435,9 +513,6 @@ class Enemy(GameSprite):
         self.enemy_health -= 1
 
 
-    enemy_health = 100
-    max_health = 100
-    patterns = [V_shape, Cross_pattern, Spiral_pattern, Laser_Beam_pattern, none]
 
     def draw_hp_bar(self, max_health, enemy_health):
         draw.rect(screen, (255,0,0), (50, 25, win_width - 100, 20))
@@ -447,11 +522,34 @@ class Enemy(GameSprite):
     def hp_del(self):
         self.enemy_health -= 1
         
+def show_end_menu(elapsed_time):
+    text = font.render(f"Ви пройшли рівень за {elapsed_time / 1000:.2f} секунд!", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(400, 300))  # Розміщуємо текст по центру екрану
+    screen.blit(text, text_rect)
+
+    instructions = font.render("Натисніть Enter для продовження", True, (255, 255, 255))
+    instructions_rect = instructions.get_rect(center=(400, 350))  # Знову розміщаємо по центру
+    screen.blit(instructions, instructions_rect)
+    display.flip()
+
+def restart_game():
+    global start_time_game
+    global round_over
+    global game
+    game = "game"
+    Enemy.lvl += 1
+    start_time_game = time.get_ticks()
+    end_time = None
+    Bad_Fumo.rect.x = win_width / 2
+    Bad_Fumo.rect.y = 1000
+    Bad_Fumo.enemy_health = 1000
+    round_over = False
+
 
 Fumo_destroyer = Player('Fumo Hero/sprites/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
 Fumo_destroyer_hitbox = GameSprite('Fumo Hero/sprites/hitbox.png', Fumo_destroyer.rect.x, Fumo_destroyer.rect.y, 4, 16, 16)
 
-Bad_Fumo = Enemy('Fumo Hero/sprites/Cirno9.webp', (win_width / 2) -50, 64, 2, 50,102, 100)
+Bad_Fumo = Enemy('Fumo Hero/sprites/Cirno9.webp', (win_width / 2) -50, 1000, 2, 50,102, 1000, 100)
 
 clock = time.Clock()
 frames = 144
@@ -469,7 +567,7 @@ btn_sound = GameSprite("Fumo Hero/sprites/button_sound.png", 102, 280, 0, 150, 1
 
 btn_back = GameSprite("Fumo Hero/sprites/button_back.png", 5, 10, 0, 320, 132)
 
-
+start_time_game = None
 game = "menu"
 running = True
 mute = False
@@ -501,9 +599,22 @@ while running:
         elif e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == True:
             btn_sound = GameSprite("Fumo Hero/sprites/button_sound.png", 102, 280, 0, 150, 140)
             mute = False
+        if e.type == KEYDOWN:
+            if e.key == K_RETURN and round_over == True:
+                restart_game() 
+
+
+    if game == "round_over":
+        
+        screen.blit(background, (0,0))
+        elapsed_time = current_time - start_time_game
+        show_end_menu(elapsed_time)
+        
+
 
 
     if game == "menu":
+
         btn_back.kill()
         btn_sound.kill()
         Mouse = mouse.get_pos()
@@ -540,12 +651,17 @@ while running:
             btn_back = GameSprite("Fumo Hero/sprites/button_back.png", 5, 10, 0, 320, 132)
 
     if game == "game":
+        if start_time_game is None:  # Перевіряємо, чи ще не ініціалізовано start_time
+            start_time_game = time.get_ticks()
+        if music == 'Fumo Hero/sounds/bgm.ogg':
+            music = 'Fumo Hero/sounds/Sakuya_music.mp3'
+            mixer.music.load(music)
+            mixer.music.play(-1)
+            
+
         if mute == True:
-            mixer.music.load("Fumo Hero/baka-cirno.mp3")
-        if Bad_Fumo.enemy_health <= 0:
-            items.create_item_bomb()
-            items.create_item_health()
-            Bad_Fumo.rect.x = 10000000
+            mixer.music.load("Fumo Hero/Sounds/baka-cirno.mp3")
+
         screen.blit(background, (0, 0))
         Fumo_destroyer.reset()
         Fumo_destroyer_hitbox.reset()
