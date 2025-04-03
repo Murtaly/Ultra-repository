@@ -256,13 +256,15 @@ class Enemy(GameSprite):
         self.bullet_image = "Fumo Hero/sprites/Bullet.png"
         
     size = (20, 36)
-    lvl = 0
+    lvl = 1
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
     marisa_idle = ["Marisa_idle1.png", "Marisa_idle2.png", "Marisa_idle3.png", "Marisa_idle4.png", "Marisa_idle5.png", "Marisa_idle6.png", "Marisa_idle7.png", "Marisa_idle8.png", "Marisa_idle9.png", "Marisa_idle10.png"]
     marisa_attack = ["Marisa_attack_2_1.png", "Marisa_attack_2_2.png", "Marisa_attack_2_3.png", "Marisa_attack_2_4.png", "Marisa_attack_2_5.png", "Marisa_attack_2_6.png", "Marisa_attack_2_7.png"]
+    marisa_start = ["Marisa_start1.png", "Marisa_start2.png", "Marisa_start3.png", "Marisa_start4.png", "Marisa_start5.png", "Marisa_start6.png", "Marisa_start7.png", "Marisa_start8.png", "Marisa_start9.png", "Marisa_start10.png", "Marisa_start11.png", ]
     counter_attack = 0
     counter_idle = 0
+    counter_start = 0
 
     def idle(self):
         if self.lvl == 0:
@@ -293,7 +295,18 @@ class Enemy(GameSprite):
                     
             if self.counter_attack >= len(self.marisa_attack) - 1:
                 self.counter_attack = 0
-        
+    
+    def start_anim(self):
+        if self.lvl == 0:
+            None
+
+        elif self.lvl == 1:
+            if self.rect.y < 720:
+                self.counter_start += 0.04
+                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_start[int(self.counter_start)]}"), (80, 125))
+            
+                if self.counter_start >= len(self.marisa_start) - 1:
+                    self.counter_start = 0
 
 
     def update(self):
@@ -361,7 +374,7 @@ class Enemy(GameSprite):
     def Bad_fumo_fight(self):
         global random_number
         if 110 < self.enemy_health :
-            self.idle()
+            self.start_anim()
             self.current_pattern_index = 10
             self.direction = "up"
             if self.rect.y <= 64:
