@@ -330,7 +330,6 @@ class Enemy(GameSprite):
         if self.direction == "right":
             self.rect.x += self.speed
 
-
         if self.direction == "up":
             self.rect.y -= self.speed
 
