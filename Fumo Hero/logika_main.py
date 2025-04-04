@@ -227,6 +227,12 @@ class EnemyBullet(sprite.Sprite):
         self.rect = self.enemy_image.get_rect(center=(bullet_x, bullet_y))
         self.speed = speed
         self.angle = angle
+        if Enemy.lvl == 0:
+            self.speed = speed + 2
+        if Enemy.lvl == 1:
+            self.speed = speed - 2
+        if Enemy.lvl == 2:
+            self.speed = speed + 4
 
     def draw_bullet(self):
         screen.blit(self.enemy_image, self.rect.topleft)
@@ -238,6 +244,7 @@ class EnemyBullet(sprite.Sprite):
 
         if self.rect.y > win_height or self.rect.y < 0 or self.rect.x > win_width or self.rect.x < 0:
             self.kill()
+
 
 class Enemy(GameSprite):
     def __init__(self, player_image, playerX, playerY, player_speed, width, heigth, enemy_health, max_health):
@@ -253,7 +260,7 @@ class Enemy(GameSprite):
         self.bullet_image = "Fumo Hero/sprites/Bullet.png"
         
     size = (20, 36)
-    lvl = 2
+    lvl = 0
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
     sakuya_start = ["Sakuya_start1.png", "Sakuya_start2.png", "Sakuya_start3.png", "Sakuya_start4.png", "Sakuya_start5.png", "Sakuya_start6.png", "Sakuya_start7.png", "Sakuya_start8.png", "Sakuya_start9.png", "Sakuya_start10.png", "Sakuya_start11.png", "Sakuya_start12.png", "Sakuya_start13.png", "Sakuya_start14.png", "Sakuya_start15.png", "Sakuya_start16.png"]
@@ -651,9 +658,7 @@ while running:
         screen.blit(background, (0,0))
         elapsed_time = current_time - start_time_game
         show_end_menu(elapsed_time)
-        
-
-
+    
 
     if game == "menu":
 
