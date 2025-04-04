@@ -396,8 +396,14 @@ class Enemy(GameSprite):
                 self.bullet_image = "Fumo Hero/sprites/Marisa_bullet.png"
                 Enemy.size = (32, 32)
         if self.lvl == 2: 
-            self.bullet_image = "Fumo Hero/sprites/Remilia_bullet.png"
-            Enemy.size = (24, 30)
+            if music == 'Fumo Hero/sounds/Marisa_music.mp3':
+                background = transform.scale(image.load("Fumo Hero/sprites/Remiliya_bg.jpg"), (900, 720))
+                music = 'Fumo Hero/sounds/Remiliya_music.mp3'
+                mixer.music.load(music)
+                mixer.music.play(-1)
+                self.bullet_image = "Fumo Hero/sprites/Remilia_bullet.png"
+                Enemy.size = (24, 30)
+                    
 
 
     def none(self):
