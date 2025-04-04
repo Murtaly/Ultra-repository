@@ -64,7 +64,7 @@ class Player(GameSprite):
     counter_s_attack = 0
     counter_right = 0
     counter_left = 0
-    health_counter = 3 #3
+    health_counter = 100 #3
     bomb_counter = 3 #3
 
     Health_image = transform.scale(image.load("Fumo Hero/sprites/Health.png"), (64, 64))
@@ -322,26 +322,29 @@ class Enemy(GameSprite):
         if self.lvl == 0:
             if self.rect.y < 720:
                 self.counter_start += 0.045
-                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_start[int(self.counter_start)]}"), (95, 125))
-            
                 if self.counter_start >= len(self.sakuya_start) - 1:
                     self.counter_start = 0
+                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.sakuya_start[int(self.counter_start)]}"), (95, 125))
+            
+                
 
         if self.lvl == 1:
             if self.rect.y < 720:
                 self.counter_start += 0.04
-                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_start[int(self.counter_start)]}"), (107, 125))
-            
                 if self.counter_start >= len(self.marisa_start) - 1:
                     self.counter_start = 0
+                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_start[int(self.counter_start)]}"), (107, 125))
+            
+                
 
         if self.lvl == 2:
             if self.rect.y < 720:
                 self.counter_start += 0.04
-                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_start[int(self.counter_start)]}"), (126, 122))
-            
                 if self.counter_start >= len(self.remilia_start) - 1:
                     self.counter_start = 0
+                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_start[int(self.counter_start)]}"), (126, 122))
+            
+                
 
 
     def update(self):
@@ -592,6 +595,9 @@ def restart_game():
     global round_over
     global game
     game = "game"
+    Enemy.counter_idle = 0
+    Enemy.counter_attack = 0
+    Enemy.counter_start = 0
     Enemy.lvl += 1
     start_time_game = time.get_ticks()
     end_time = None
