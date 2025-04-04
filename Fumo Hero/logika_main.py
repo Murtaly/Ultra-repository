@@ -259,10 +259,13 @@ class Enemy(GameSprite):
     lvl = 0
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
-    sakuya_start = ["Sakuya_start1.png", "Sakuya_start2.png", "Sakuya_start3.png", "Sakuya_start4.png", "Sakuya_start5.png", "Sakuya_start6.png", "Sakuya_start7.png", "Sakuya_start8.png", "Sakuya_start9.png", "Sakuya_start10.png", "Sakuya_start11.png", "Sakuya_start12.png", "Sakuya_start13.png", "Sakuya_start14.png", "Sakuya_start15.png", "Sakuya_start16.png", ]
+    sakuya_start = ["Sakuya_start1.png", "Sakuya_start2.png", "Sakuya_start3.png", "Sakuya_start4.png", "Sakuya_start5.png", "Sakuya_start6.png", "Sakuya_start7.png", "Sakuya_start8.png", "Sakuya_start9.png", "Sakuya_start10.png", "Sakuya_start11.png", "Sakuya_start12.png", "Sakuya_start13.png", "Sakuya_start14.png", "Sakuya_start15.png", "Sakuya_start16.png"]
     marisa_idle = ["Marisa_idle1.png", "Marisa_idle2.png", "Marisa_idle3.png", "Marisa_idle4.png", "Marisa_idle5.png", "Marisa_idle6.png", "Marisa_idle7.png", "Marisa_idle8.png", "Marisa_idle9.png", "Marisa_idle10.png"]
     marisa_attack = ["Marisa_attack_2_1.png", "Marisa_attack_2_2.png", "Marisa_attack_2_3.png", "Marisa_attack_2_4.png", "Marisa_attack_2_5.png", "Marisa_attack_2_6.png", "Marisa_attack_2_7.png"]
-    marisa_start = ["Marisa_start1.png", "Marisa_start2.png", "Marisa_start3.png", "Marisa_start4.png", "Marisa_start5.png", "Marisa_start6.png", "Marisa_start7.png", "Marisa_start8.png", "Marisa_start9.png", "Marisa_start10.png", "Marisa_start11.png", ]
+    marisa_start = ["Marisa_start1.png", "Marisa_start2.png", "Marisa_start3.png", "Marisa_start4.png", "Marisa_start5.png", "Marisa_start6.png", "Marisa_start7.png", "Marisa_start8.png", "Marisa_start9.png", "Marisa_start10.png", "Marisa_start11.png"]
+    remilia_idle = ["Remilia_idle1.png", "Remilia_idle2.png", "Remilia_idle3.png", "Remilia_idle4.png", "Remilia_idle5.png", "Remilia_idle6.png", "Remilia_idle7.png", "Remilia_idle8.png"]
+    remilia_attack = ["Remilia_attack1.png", "Remilia_attack2.png", "Remilia_attack3.png", "Remilia_attack4.png", "Remilia_attack5.png", "Remilia_attack6.png", "Remilia_attack7.png", "Remilia_attack8.png"]
+    remilia_start = ["Remilia_start1.png", "Remilia_start2.png", "Remilia_start3.png", "Remilia_start4.png", "Remilia_start5.png", "Remilia_start6.png", "Remilia_start7.png", "Remilia_start8.png", "Remilia_start9.png", "Remilia_start10.png"]
     counter_attack = 0
     counter_idle = 0
     counter_start = 0
@@ -275,11 +278,18 @@ class Enemy(GameSprite):
             if self.counter_idle >= len(self.sakuya_idle) - 1:
                 self.counter_idle = 0
 
-        elif self.lvl == 1:
+        if self.lvl == 1:
             self.counter_idle += 0.05
             self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_idle[int(self.counter_idle)]}"), (57, 100))
                 
             if self.counter_idle >= len(self.marisa_idle) - 1:
+                self.counter_idle = 0
+        
+        if self.lvl == 2:
+            self.counter_idle += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_idle[int(self.counter_idle)]}"), (119, 111))
+                
+            if self.counter_idle >= len(self.remilia_idle) - 1:
                 self.counter_idle = 0
 
     def attack(self):
@@ -290,11 +300,18 @@ class Enemy(GameSprite):
             if self.counter_attack >= len(self.sakuya_attack) - 1:
                 self.counter_attack = 0
 
-        elif self.lvl == 1:
+        if self.lvl == 1:
             self.counter_attack += 0.05
             self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_attack[int(self.counter_attack)]}"), (65, 102))
                     
             if self.counter_attack >= len(self.marisa_attack) - 1:
+                self.counter_attack = 0
+            
+        if self.lvl == 2:
+            self.counter_attack += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_attack[int(self.counter_attack)]}"), (112, 123))
+                    
+            if self.counter_attack >= len(self.remilia_attack) - 1:
                 self.counter_attack = 0
     
     def start_anim(self):
@@ -306,13 +323,22 @@ class Enemy(GameSprite):
                 if self.counter_start >= len(self.sakuya_start) - 1:
                     self.counter_start = 0
 
-        elif self.lvl == 1:
+        if self.lvl == 1:
             self.counter_start = 0
             if self.rect.y < 720:
                 self.counter_start += 0.04
                 self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_start[int(self.counter_start)]}"), (107, 125))
             
                 if self.counter_start >= len(self.marisa_start) - 1:
+                    self.counter_start = 0
+
+        if self.lvl == 2:
+            self.counter_start = 0
+            if self.rect.y < 720:
+                self.counter_start += 0.04
+                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_start[int(self.counter_start)]}"), (126, 122))
+            
+                if self.counter_start >= len(self.remilia_start) - 1:
                     self.counter_start = 0
 
 
@@ -363,9 +389,9 @@ class Enemy(GameSprite):
 
         self.Bad_fumo_fight()
 
-        if Enemy.lvl == 0:
+        if self.lvl == 0:
             self.bullet_image = "Fumo Hero/sprites/Bullet.png"
-            Enemy.size = (20, 36)
+            self.size = (20, 36)
         if Enemy.lvl == 1:
             if music == 'Fumo Hero/sounds/Sakuya_music.mp3':
                 background = transform.scale(image.load("Fumo Hero/sprites/Marisa_bg.jpg"), (900, 720))
@@ -373,8 +399,12 @@ class Enemy(GameSprite):
                 mixer.music.load(music)
                 mixer.music.play(-1)
                 self.bullet_image = "Fumo Hero/sprites/Marisa_bullet.png"
-                Enemy.size = (32, 32) 
-        
+                Enemy.size = (32, 32)
+        if Enemy.lvl == 2: 
+            self.bullet_image = "Fumo Hero/sprites/Remilia_bullet.png"
+            Enemy.size = (32, 32)
+
+
     def none(self):
         None
 
