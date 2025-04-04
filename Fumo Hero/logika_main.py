@@ -229,11 +229,8 @@ class EnemyBullet(sprite.Sprite):
         self.angle = angle
 
     def draw_bullet(self):
-        if Enemy.lvl == 0:
-            screen.blit(self.enemy_image, self.rect.topleft)
-        elif Enemy.lvl == 1:
-            screen.blit(self.enemy_image, self.rect.topleft)
-
+        screen.blit(self.enemy_image, self.rect.topleft)
+            
     def update(self):
 
         self.rect.x += self.speed * math.cos(math.radians(self.angle))
@@ -256,7 +253,7 @@ class Enemy(GameSprite):
         self.bullet_image = "Fumo Hero/sprites/Bullet.png"
         
     size = (20, 36)
-    lvl = 0
+    lvl = 2
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
     sakuya_start = ["Sakuya_start1.png", "Sakuya_start2.png", "Sakuya_start3.png", "Sakuya_start4.png", "Sakuya_start5.png", "Sakuya_start6.png", "Sakuya_start7.png", "Sakuya_start8.png", "Sakuya_start9.png", "Sakuya_start10.png", "Sakuya_start11.png", "Sakuya_start12.png", "Sakuya_start13.png", "Sakuya_start14.png", "Sakuya_start15.png", "Sakuya_start16.png"]
@@ -324,7 +321,6 @@ class Enemy(GameSprite):
                     self.counter_start = 0
 
         if self.lvl == 1:
-            self.counter_start = 0
             if self.rect.y < 720:
                 self.counter_start += 0.04
                 self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.marisa_start[int(self.counter_start)]}"), (107, 125))
@@ -333,7 +329,6 @@ class Enemy(GameSprite):
                     self.counter_start = 0
 
         if self.lvl == 2:
-            self.counter_start = 0
             if self.rect.y < 720:
                 self.counter_start += 0.04
                 self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_start[int(self.counter_start)]}"), (126, 122))
@@ -391,8 +386,8 @@ class Enemy(GameSprite):
 
         if self.lvl == 0:
             self.bullet_image = "Fumo Hero/sprites/Bullet.png"
-            self.size = (20, 36)
-        if Enemy.lvl == 1:
+            Enemy.size = (20, 36)
+        if self.lvl == 1:
             if music == 'Fumo Hero/sounds/Sakuya_music.mp3':
                 background = transform.scale(image.load("Fumo Hero/sprites/Marisa_bg.jpg"), (900, 720))
                 music = 'Fumo Hero/sounds/Marisa_music.mp3'
@@ -400,9 +395,9 @@ class Enemy(GameSprite):
                 mixer.music.play(-1)
                 self.bullet_image = "Fumo Hero/sprites/Marisa_bullet.png"
                 Enemy.size = (32, 32)
-        if Enemy.lvl == 2: 
+        if self.lvl == 2: 
             self.bullet_image = "Fumo Hero/sprites/Remilia_bullet.png"
-            Enemy.size = (32, 32)
+            Enemy.size = (24, 30)
 
 
     def none(self):
@@ -560,8 +555,6 @@ class Enemy(GameSprite):
     
     def hp_del(self):
         self.enemy_health -= 1
-
-
 
     def draw_hp_bar(self, max_health, enemy_health):
         draw.rect(screen, (255,0,0), (50, 25, win_width - 100, 20))
