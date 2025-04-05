@@ -34,10 +34,8 @@ mixer.music.play(-1)
 mixer.music.set_volume(0.5)
 counter_time = 0
 
-
-
-
-baka = mixer.Sound("Fumo Hero/sounds/baka-cirno.mp3")
+baka = mixer.Sound("Fumo Hero/sounds/dmg.mp3")
+encounter = mixer.Sound("Fumo Hero/sounds/encounter.mp3")
 
 class GameSprite(sprite.Sprite):    
     def __init__(self, player_image, playerX, playerY, player_speed, width, heigth):
@@ -227,12 +225,13 @@ class EnemyBullet(sprite.Sprite):
         self.rect = self.enemy_image.get_rect(center=(bullet_x, bullet_y))
         self.speed = speed
         self.angle = angle
-        if Enemy.lvl == 0:
-            self.speed = speed + 2
-        if Enemy.lvl == 1:
-            self.speed = speed - 2
-        if Enemy.lvl == 2:
-            self.speed = speed + 4
+        if diff == 1:
+            if Enemy.lvl == 0:
+                self.speed = speed + 2
+            if Enemy.lvl == 1:
+                self.speed = speed - 0.5
+            if Enemy.lvl == 2:
+                self.speed = speed + 4
 
     def draw_bullet(self):
         screen.blit(self.enemy_image, self.rect.topleft)
@@ -369,7 +368,7 @@ class Enemy(GameSprite):
             if elapsed_time >= 5000:
                 self.end_time = time.get_ticks()
                 game = "round_over"
-
+                self.start_time = None
 
         
         if self.direction == "down":
@@ -402,7 +401,10 @@ class Enemy(GameSprite):
                 background = transform.scale(image.load("Fumo Hero/sprites/Marisa_bg.jpg"), (900, 720))
                 music = 'Fumo Hero/sounds/Marisa_music.mp3'
                 mixer.music.load(music)
-                mixer.music.play(-1)
+                if mute != True:
+                    mixer.music.play(-1)
+                else:
+                    None
                 self.bullet_image = "Fumo Hero/sprites/Marisa_bullet.png"
                 Enemy.size = (32, 32)
         if self.lvl == 2: 
@@ -410,11 +412,13 @@ class Enemy(GameSprite):
                 background = transform.scale(image.load("Fumo Hero/sprites/Remiliya_bg.jpg"), (900, 720))
                 music = 'Fumo Hero/sounds/Remiliya_music.mp3'
                 mixer.music.load(music)
-                mixer.music.play(-1)
+                if mute != True:
+                    mixer.music.play(-1)
+                else:
+                    None
                 self.bullet_image = "Fumo Hero/sprites/Remilia_bullet.png"
                 Enemy.size = (24, 30)
                     
-
 
     def none(self):
         None
@@ -425,6 +429,8 @@ class Enemy(GameSprite):
             self.start_anim()
             self.current_pattern_index = 10
             self.direction = "up"
+            if self.rect.y == 650:
+                encounter.play(0)
             if self.rect.y <= 64:
                 self.enemy_health = 100
                 self.direction = "right"
@@ -592,6 +598,7 @@ def show_end_menu(elapsed_time):
 
 def restart_game():
     global start_time_game
+    global elapsed_time
     global round_over
     global game
     game = "game"
@@ -599,6 +606,7 @@ def restart_game():
     Enemy.counter_attack = 0
     Enemy.counter_start = 0
     Enemy.lvl += 1
+    elapsed_time = None
     start_time_game = time.get_ticks()
     end_time = None
     Bad_Fumo.rect.x = win_width / 2
@@ -628,7 +636,13 @@ btn_sound = GameSprite("Fumo Hero/sprites/button_sound.png", 102, 280, 0, 150, 1
 
 btn_back = GameSprite("Fumo Hero/sprites/button_back.png", 5, 10, 0, 320, 132)
 
+btn_ez = GameSprite("Fumo Hero/sprites/eazy_button.png", 125, 280, 0, 320, 132)
+
+btn_hard = GameSprite("Fumo Hero/sprites/hard_button.png", 450, 280, 0, 320, 132)
+
+elapsed_time = None
 start_time_game = None
+diff = 0
 game = "menu"
 running = True
 mute = False
@@ -641,41 +655,48 @@ while running:
 
         if e.type == QUIT:
             running = False
-        if e.type == MOUSEBUTTONDOWN and btn_play.rect.collidepoint(Mouse):
-            game = "game"
 
-        if e.type == MOUSEBUTTONDOWN and btn_exit.rect.collidepoint(Mouse):
+        if e.type == MOUSEBUTTONDOWN and btn_play.rect.collidepoint(Mouse) and game == "menu":
+            game = "difficulty selection"
+
+        if e.type == MOUSEBUTTONDOWN and btn_exit.rect.collidepoint(Mouse) and game == "menu":
             running = False
 
-        if e.type == MOUSEBUTTONDOWN and btn_settings.rect.collidepoint(Mouse):
+        if e.type == MOUSEBUTTONDOWN and btn_settings.rect.collidepoint(Mouse) and game == "menu":
             game = "settings"
 
-        if e.type == MOUSEBUTTONDOWN and btn_back.rect.collidepoint(Mouse):
+        if e.type == MOUSEBUTTONDOWN and btn_back.rect.collidepoint(Mouse) and game == "settings":
             game = "menu"
 
-        if e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == False:
+        if e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == False and game == "settings":
             btn_sound = GameSprite("Fumo Hero/sprites/button_mute_sound.png", 102, 280, 0, 150, 140)
             mute = True
 
-        elif e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == True:
+        elif e.type == MOUSEBUTTONDOWN and btn_sound.rect.collidepoint(Mouse) and mute == True and game == "settings":
             btn_sound = GameSprite("Fumo Hero/sprites/button_sound.png", 102, 280, 0, 150, 140)
             mute = False
+
+        if e.type == MOUSEBUTTONDOWN and btn_ez.rect.collidepoint(Mouse) and game == "difficulty selection":
+            game = "game"
+            diff == 0
+
+        if e.type == MOUSEBUTTONDOWN and btn_hard.rect.collidepoint(Mouse) and game == "difficulty selection":
+            game = "game"
+            diff == 1
+
         if e.type == KEYDOWN:
             if e.key == K_RETURN and round_over == True:
                 restart_game() 
 
 
     if game == "round_over":
-        
+        if elapsed_time is None:  # Перевіряємо, чи ще не ініціалізовано start_time
+            elapsed_time = current_time - start_time_game
         screen.blit(background, (0,0))
-        elapsed_time = current_time - start_time_game
         show_end_menu(elapsed_time)
     
 
     if game == "menu":
-
-        btn_back.kill()
-        btn_sound.kill()
         Mouse = mouse.get_pos()
         screen.blit(background, (0,0))
         btn_play.reset()
@@ -697,9 +718,6 @@ while running:
             btn_settings = GameSprite("Fumo Hero/sprites/button_settings.png", 260, 492, 0, 320, 132)
 
     if game == "settings":
-        btn_play.kill()
-        btn_exit.kill()
-        btn_settings.kill() 
         Mouse = mouse.get_pos()
         screen.blit(background, (0, 0))
         btn_sound.reset()
@@ -709,15 +727,32 @@ while running:
         elif not btn_back.rect.collidepoint(Mouse):
             btn_back = GameSprite("Fumo Hero/sprites/button_back.png", 5, 10, 0, 320, 132)
 
+    if game == "difficulty selection":
+        Mouse = mouse.get_pos()
+        screen.blit(background, (0, 0))
+        btn_ez.reset()
+        btn_hard.reset()
+        if btn_ez.rect.collidepoint(Mouse):
+            btn_ez = GameSprite("Fumo Hero/sprites/eazy_button_pressed.png", 125, 280, 0, 320, 132)
+        elif not btn_ez.rect.collidepoint(Mouse):
+            btn_ez = GameSprite("Fumo Hero/sprites/eazy_button.png", 125, 280, 0, 320, 132)
+        
+        if btn_hard.rect.collidepoint(Mouse):
+            btn_hard = GameSprite("Fumo Hero/sprites/hard_button_pressed.png", 450, 280, 0, 320, 132)
+        elif not btn_hard.rect.collidepoint(Mouse):
+            btn_hard = GameSprite("Fumo Hero/sprites/hard_button.png", 450, 280, 0, 320, 132)
+
     if game == "game":
         if start_time_game is None:  # Перевіряємо, чи ще не ініціалізовано start_time
             start_time_game = time.get_ticks()
         if music == 'Fumo Hero/sounds/bgm.ogg':
             music = 'Fumo Hero/sounds/Sakuya_music.mp3'
             mixer.music.load(music)
-            mixer.music.play(-1)
+            if mute != True:
+                mixer.music.play(-1)
+            else:
+                None
             
-
         if mute == True:
             mixer.music.load("Fumo Hero/Sounds/baka-cirno.mp3")
 
