@@ -272,6 +272,9 @@ class Enemy(GameSprite):
     remilia_idle = ["Remilia_idle1.png", "Remilia_idle2.png", "Remilia_idle3.png", "Remilia_idle4.png", "Remilia_idle5.png", "Remilia_idle6.png", "Remilia_idle7.png", "Remilia_idle8.png"]
     remilia_attack = ["Remilia_attack1.png", "Remilia_attack2.png", "Remilia_attack3.png", "Remilia_attack4.png", "Remilia_attack5.png", "Remilia_attack6.png", "Remilia_attack7.png", "Remilia_attack8.png"]
     remilia_start = ["Remilia_start1.png", "Remilia_start2.png", "Remilia_start3.png", "Remilia_start4.png", "Remilia_start5.png", "Remilia_start6.png", "Remilia_start7.png", "Remilia_start8.png", "Remilia_start9.png", "Remilia_start10.png"]
+    reimu_idle = ["Reimu_idle1.png", "Reimu_idle2.png", "Reimu_idle3.png", "Reimu_idle4.png", "Reimu_idle5.png", "Reimu_idle6.png", "Reimu_idle7.png", "Reimu_idle8.png", "Reimu_idle9.png", "Reimu_idle10.png"]
+    reimu_attack = ["Reimu_attack1.png", "Reimu_attack2.png", "Reimu_attack3.png", "Reimu_attack4.png", "Reimu_attack5.png", "Reimu_attack6.png", "Reimu_attack7.png", "Reimu_attack8.png", "Reimu_attack9.png", "Reimu_attack10.png", "Reimu_attack11.png", "Reimu_attack12.png", "Reimu_attack13.png"]
+    reimu_start = ["Reimu_start1.png", "Reimu_start2.png", "Reimu_start3.png", "Reimu_start4.png", "Reimu_start5.png", "Reimu_start6.png", "Reimu_start7.png", "Reimu_start8.png"]
     counter_attack = 0
     counter_idle = 0
     counter_start = 0
@@ -300,6 +303,13 @@ class Enemy(GameSprite):
             if self.counter_idle >= len(self.remilia_idle) - 1:
                 self.counter_idle = 0
 
+        if self.lvl == 3:
+            self.counter_idle += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.reimu_idle[int(self.counter_idle)]}"), (128, 128))
+                
+            if self.counter_idle >= len(self.reimu_idle) - 1:
+                self.counter_idle = 0
+
     def attack(self):
         if self.lvl == 0:
             self.counter_attack += 0.05
@@ -320,6 +330,13 @@ class Enemy(GameSprite):
             self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_attack[int(self.counter_attack)]}"), (112, 123))
                     
             if self.counter_attack >= len(self.remilia_attack) - 1:
+                self.counter_attack = 0
+
+        if self.lvl == 3:
+            self.counter_attack += 0.05
+            self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.reimu_attack[int(self.counter_attack)]}"), (128, 128))
+                    
+            if self.counter_attack >= len(self.reimu_attack) - 1:
                 self.counter_attack = 0
     
     def start_anim(self):
@@ -348,7 +365,12 @@ class Enemy(GameSprite):
                     self.counter_start = 0
                 self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.remilia_start[int(self.counter_start)]}"), (126, 122))
             
-                
+        if self.lvl == 3:
+            if self.rect.y < 720:
+                self.counter_start += 0.04
+                if self.counter_start >= len(self.reimu_start) - 1:
+                    self.counter_start = 0
+                self.image = transform.scale(image.load(f"Fumo Hero/sprites/{self.reimu_start[int(self.counter_start)]}"), (128, 160))        
 
 
     def update(self):
