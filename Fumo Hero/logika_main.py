@@ -262,7 +262,7 @@ class Enemy(GameSprite):
         
 
     size = (20, 36)
-    lvl = 0
+    lvl = 3
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
     sakuya_start = ["Sakuya_start1.png", "Sakuya_start2.png", "Sakuya_start3.png", "Sakuya_start4.png", "Sakuya_start5.png", "Sakuya_start6.png", "Sakuya_start7.png", "Sakuya_start8.png", "Sakuya_start9.png", "Sakuya_start10.png", "Sakuya_start11.png", "Sakuya_start12.png", "Sakuya_start13.png", "Sakuya_start14.png", "Sakuya_start15.png", "Sakuya_start16.png"]
@@ -273,7 +273,7 @@ class Enemy(GameSprite):
     remilia_attack = ["Remilia_attack1.png", "Remilia_attack2.png", "Remilia_attack3.png", "Remilia_attack4.png", "Remilia_attack5.png", "Remilia_attack6.png", "Remilia_attack7.png", "Remilia_attack8.png"]
     remilia_start = ["Remilia_start1.png", "Remilia_start2.png", "Remilia_start3.png", "Remilia_start4.png", "Remilia_start5.png", "Remilia_start6.png", "Remilia_start7.png", "Remilia_start8.png", "Remilia_start9.png", "Remilia_start10.png"]
     reimu_idle = ["Reimu_idle1.png", "Reimu_idle2.png", "Reimu_idle3.png", "Reimu_idle4.png", "Reimu_idle5.png", "Reimu_idle6.png", "Reimu_idle7.png", "Reimu_idle8.png", "Reimu_idle9.png", "Reimu_idle10.png"]
-    reimu_attack = ["Reimu_attack1.png", "Reimu_attack2.png", "Reimu_attack3.png", "Reimu_attack4.png", "Reimu_attack5.png", "Reimu_attack6.png", "Reimu_attack7.png", "Reimu_attack8.png", "Reimu_attack9.png", "Reimu_attack10.png", "Reimu_attack11.png", "Reimu_attack12.png", "Reimu_attack13.png"]
+    reimu_attack = ["Reimu_attack2.png", "Reimu_attack3.png", "Reimu_attack4.png", "Reimu_attack5.png", "Reimu_attack6.png", "Reimu_attack7.png", "Reimu_attack8.png", "Reimu_attack9.png", "Reimu_attack10.png", "Reimu_attack11.png", "Reimu_attack12.png", "Reimu_attack13.png"]
     reimu_start = ["Reimu_start1.png", "Reimu_start2.png", "Reimu_start3.png", "Reimu_start4.png", "Reimu_start5.png", "Reimu_start6.png", "Reimu_start7.png", "Reimu_start8.png"]
     counter_attack = 0
     counter_idle = 0
