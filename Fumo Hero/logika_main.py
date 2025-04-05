@@ -262,7 +262,7 @@ class Enemy(GameSprite):
         
 
     size = (20, 36)
-    lvl = 3
+    lvl = 0
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
     sakuya_attack = ["Sakuya_attack1.png", "Sakuya_attack2.png", "Sakuya_attack3.png", "Sakuya_attack4.png", "Sakuya_attack5.png", "Sakuya_attack6.png", "Sakuya_attack7.png"]
     sakuya_start = ["Sakuya_start1.png", "Sakuya_start2.png", "Sakuya_start3.png", "Sakuya_start4.png", "Sakuya_start5.png", "Sakuya_start6.png", "Sakuya_start7.png", "Sakuya_start8.png", "Sakuya_start9.png", "Sakuya_start10.png", "Sakuya_start11.png", "Sakuya_start12.png", "Sakuya_start13.png", "Sakuya_start14.png", "Sakuya_start15.png", "Sakuya_start16.png"]
