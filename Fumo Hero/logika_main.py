@@ -225,18 +225,20 @@ class EnemyBullet(sprite.Sprite):
         self.rect = self.enemy_image.get_rect(center=(bullet_x, bullet_y))
         self.speed = speed
         self.angle = angle
-        if diff == 1:
-            if Enemy.lvl == 0:
-                self.speed = speed + 2
-            if Enemy.lvl == 1:
-                self.speed = speed - 0.5
-            if Enemy.lvl == 2:
-                self.speed = speed + 4
+        
 
     def draw_bullet(self):
         screen.blit(self.enemy_image, self.rect.topleft)
             
     def update(self):
+        global diff
+        if diff == 1:
+            if Enemy.lvl == 0:
+                self.speed = self.speed + 2
+            if Enemy.lvl == 1:
+                self.speed = self.speed - 0.5
+            if Enemy.lvl == 2:
+                self.speed = self.speed + 4
 
         self.rect.x += self.speed * math.cos(math.radians(self.angle))
         self.rect.y += self.speed * math.sin(math.radians(self.angle))
