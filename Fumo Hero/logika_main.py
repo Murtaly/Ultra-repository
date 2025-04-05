@@ -411,9 +411,9 @@ class Enemy(GameSprite):
                 else:
                     None
                 self.bullet_image = "Fumo Hero/sprites/Marisa_bullet.png"
-                Enemy.size = (32, 32)
+                Enemy.size = (24, 24)
         if self.lvl == 2: 
-            if music == 'Fumo Hero/sounds/Marisa_music.mp3':
+            if music == 'Fumo Hero/sounds/Marisa_music.mp3' or music == 'Fumo Hero/sounds/Sakuya_music.mp3':
                 background = transform.scale(image.load("Fumo Hero/sprites/Remiliya_bg.jpg"), (900, 720))
                 music = 'Fumo Hero/sounds/Remiliya_music.mp3'
                 mixer.music.load(music)
@@ -423,6 +423,9 @@ class Enemy(GameSprite):
                     None
                 self.bullet_image = "Fumo Hero/sprites/Remilia_bullet.png"
                 Enemy.size = (24, 30)
+                Bad_Fumo.rect.width = 126
+                Bad_Fumo.rect.height = 122
+                        
                     
 
     def none(self):
@@ -431,6 +434,7 @@ class Enemy(GameSprite):
     def Bad_fumo_fight(self):
         global random_number
         if 110 < self.enemy_health :
+            enemy_bullets.clear()
             self.start_anim()
             self.current_pattern_index = 10
             self.direction = "up"
@@ -618,6 +622,7 @@ def restart_game():
     Bad_Fumo.rect.y = 1000
     Bad_Fumo.enemy_health = 1000
     round_over = False
+
 
 
 Fumo_destroyer = Player('Fumo Hero/sprites/Cirno0.png', (win_width / 2) - 65, win_height - 160, 4, 64,64)
