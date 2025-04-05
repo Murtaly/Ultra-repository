@@ -12,6 +12,7 @@ background = transform.scale(image.load("Fumo Hero/sprites/background_space.jpg"
 
 screen.blit(background, (0, 0))
 
+diff = 0
 game = "menu"
 win_width = 900
 win_height = 720
@@ -225,20 +226,19 @@ class EnemyBullet(sprite.Sprite):
         self.rect = self.enemy_image.get_rect(center=(bullet_x, bullet_y))
         self.speed = speed
         self.angle = angle
+        if diff == 1:
+            if Enemy.lvl == 0:
+                    self.speed = self.speed + 2
+            if Enemy.lvl == 1:
+                    self.speed = self.speed - 0.5
+            if Enemy.lvl == 2:
+                    self.speed = self.speed + 4
         
 
     def draw_bullet(self):
         screen.blit(self.enemy_image, self.rect.topleft)
             
     def update(self):
-        global diff
-        if diff == 1:
-            if Enemy.lvl == 0:
-                self.speed = self.speed + 2
-            if Enemy.lvl == 1:
-                self.speed = self.speed - 0.5
-            if Enemy.lvl == 2:
-                self.speed = self.speed + 4
 
         self.rect.x += self.speed * math.cos(math.radians(self.angle))
         self.rect.y += self.speed * math.sin(math.radians(self.angle))
@@ -260,6 +260,7 @@ class Enemy(GameSprite):
         self.end_time = None
         self.bullet_image = "Fumo Hero/sprites/Bullet.png"
         
+
     size = (20, 36)
     lvl = 0
     sakuya_idle = ["Sakuya_idle1.png", "Sakuya_idle2.png", "Sakuya_idle3.png", "Sakuya_idle4.png", "Sakuya_idle5.png", "Sakuya_idle6.png"]
@@ -274,6 +275,8 @@ class Enemy(GameSprite):
     counter_attack = 0
     counter_idle = 0
     counter_start = 0
+
+        
 
     def idle(self):
         if self.lvl == 0:
@@ -644,7 +647,6 @@ btn_hard = GameSprite("Fumo Hero/sprites/hard_button.png", 450, 280, 0, 320, 132
 
 elapsed_time = None
 start_time_game = None
-diff = 0
 game = "menu"
 running = True
 mute = False
@@ -680,11 +682,11 @@ while running:
 
         if e.type == MOUSEBUTTONDOWN and btn_ez.rect.collidepoint(Mouse) and game == "difficulty selection":
             game = "game"
-            diff == 0
+            diff = 0
 
         if e.type == MOUSEBUTTONDOWN and btn_hard.rect.collidepoint(Mouse) and game == "difficulty selection":
             game = "game"
-            diff == 1
+            diff = 1
 
         if e.type == KEYDOWN:
             if e.key == K_RETURN and round_over == True:
@@ -769,6 +771,7 @@ while running:
         Bad_Fumo.update() 
         Fumo_destroyer_hitbox.rect.x = Fumo_destroyer.rect.x +32
         Fumo_destroyer_hitbox.rect.y = Fumo_destroyer.rect.y +32
+
         for i in allbullets:
             i.draw_bullet()
             if i.rect.y < 0:
@@ -807,6 +810,8 @@ while running:
                 Fumo_destroyer.health(Player.health_counter)
                 last_hit_health_time = current_time
                 # Handle player hit logic here
+
+        
 
     display.update()
     clock.tick(frames)
