@@ -233,7 +233,8 @@ class EnemyBullet(sprite.Sprite):
                     self.speed = self.speed - 0.5
             if Enemy.lvl == 2:
                     self.speed = self.speed + 4
-        
+            if Enemy.lvl == 3:
+                    self.speed = self.speed + 2       
 
     def draw_bullet(self):
         screen.blit(self.enemy_image, self.rect.topleft)
@@ -390,13 +391,20 @@ class Enemy(GameSprite):
             Bad_Fumo.rect.x = 10000000
 
         if round_over:
-            current_time = time.get_ticks()  # Отримуємо поточний час в мілісекундах
-            elapsed_time = current_time - self.start_time  # Різниця в мілісекундах
-            if elapsed_time >= 5000:
-                self.end_time = time.get_ticks()
-                game = "round_over"
-                self.start_time = None
-
+            if self.lvl == 3:
+                current_time = time.get_ticks()  # Отримуємо поточний час в мілісекундах
+                elapsed_time = current_time - self.start_time  # Різниця в мілісекундах
+                if elapsed_time >= 5000:
+                    self.end_time = time.get_ticks()
+                    game = "game_over"
+                    self.start_time = None
+            else:
+                current_time = time.get_ticks()  # Отримуємо поточний час в мілісекундах
+                elapsed_time = current_time - self.start_time  # Різниця в мілісекундах
+                if elapsed_time >= 5000:
+                    self.end_time = time.get_ticks()
+                    game = "round_over"
+                    self.start_time = None
         
         if self.direction == "down":
             self.rect.y += self.speed
@@ -447,6 +455,17 @@ class Enemy(GameSprite):
                 Enemy.size = (24, 30)
                 Bad_Fumo.rect.width = 126
                 Bad_Fumo.rect.height = 122
+        if self.lvl == 3:
+            if music == 'Fumo Hero/sounds/Marisa_music.mp3' or music == 'Fumo Hero/sounds/Sakuya_music.mp3' or music == 'Fumo Hero/sounds/Remiliya_music.mp3':
+                background = transform.scale(image.load("Fumo Hero/sprites/Reimu_bg.jpg"), (900, 720))
+                music = 'Fumo Hero/sounds/Reimu_music.mp3'
+                mixer.music.load(music)
+                if mute != True:
+                    mixer.music.play(-1)
+                else:
+                    None
+                self.bullet_image = "Fumo Hero/sprites/reimu_bullet.png"
+                Enemy.size = (24, 28)
                         
                     
 
@@ -614,8 +633,7 @@ class Enemy(GameSprite):
         
         draw.rect(screen, (0,255,0), (50, 25, (enemy_health / max_health) * (win_width - 100), 20))
     
-    def hp_del(self):
-        self.enemy_health -= 1
+
         
 def show_end_menu(elapsed_time):
     text = font.render(f"Ви пройшли рівень за {elapsed_time / 1000:.2f} секунд!", True, (255, 255, 255))
@@ -625,6 +643,16 @@ def show_end_menu(elapsed_time):
     instructions = font.render("Натисніть Enter для продовження", True, (255, 255, 255))
     instructions_rect = instructions.get_rect(center=(400, 350))  # Знову розміщаємо по центру
     screen.blit(instructions, instructions_rect)
+    display.flip()
+
+def show_end_game_menu():
+    text = font.render(f"Вітаю ви пройшли гру!", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(400, 300))  # Розміщуємо текст по центру екрану
+    screen.blit(text, text_rect)
+
+    instructions1 = font.render("Натисніть Esc щоб вийти з гри", True, (255, 255, 255))
+    instructions_rect1 = instructions1.get_rect(center=(400, 400))  # Знову розміщаємо по центру
+    screen.blit(instructions1, instructions_rect1)
     display.flip()
 
 def restart_game():
@@ -716,7 +744,20 @@ while running:
             diff = 1
 
         if e.type == KEYDOWN:
+            if e.key == K_ESCAPE:
+                if round_over == True:
+                    running = False
+                else:
+                    game = 'menu'
+                    background = transform.scale(image.load("Fumo Hero/sprites/background_space.jpg"), (900, 720))
+                    music = 'Fumo Hero/sounds/bgm.ogg'
+                    mixer.music.load(music)
+
+                    mixer.music.play(-1)
+                    mixer.music.set_volume(0.5)
             if e.key == K_RETURN and round_over == True:
+                restart_game() 
+            if e.key == K_F1:
                 restart_game() 
 
 
@@ -725,6 +766,10 @@ while running:
             elapsed_time = current_time - start_time_game
         screen.blit(background, (0,0))
         show_end_menu(elapsed_time)
+
+    if game == "game_over":
+        screen.blit(background, (0,0))
+        show_end_game_menu()
     
 
     if game == "menu":
