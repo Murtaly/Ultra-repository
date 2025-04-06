@@ -194,7 +194,7 @@ class items(GameSprite):
 class Bullet(sprite.Sprite):
     def __init__(self, bullet_image, bullet_x, bullet_y, speed):
         super().__init__()
-        self.image = transform.scale(image.load(bullet_image), (20, 36))
+        self.image = transform.scale(image.load(bullet_image), (16, 36))
         self.rect = self.image.get_rect()
         self.rect.x = bullet_x
         self.rect.y = bullet_y
@@ -206,7 +206,7 @@ class Bullet(sprite.Sprite):
     direction = "up"
 
     def create_bullet(self, allbullets):
-        bullet = Bullet("Fumo Hero/sprites/Bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 5)
+        bullet = Bullet("Fumo Hero/sprites/Cirno_bullet.png", Fumo_destroyer.rect.x + 25, Fumo_destroyer.rect.y, 5)
         allbullets.append(bullet)
 
     def update(self):
