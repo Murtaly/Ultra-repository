@@ -700,6 +700,11 @@ btn_ez = GameSprite("Fumo Hero/sprites/eazy_button.png", 125, 280, 0, 320, 132)
 
 btn_hard = GameSprite("Fumo Hero/sprites/hard_button.png", 450, 280, 0, 320, 132)
 
+btn_sound_up = GameSprite("Fumo Hero/sprites/button_sound_up.png", 400, 280, 0, 104, 52)
+
+btn_sound_down = GameSprite("Fumo Hero/sprites/button_sound_down.png", 400, 440, 0, 104, 52)
+
+volume_int = 5
 elapsed_time = None
 start_time_game = None
 game = "menu"
@@ -708,6 +713,7 @@ mute = False
 while running:
     counter_time += 1
     current_time = time.get_ticks()
+    volume = mixer.music.get_volume()
 
     for e in event.get():
         Fumo_destroyer.use_bomb()
@@ -717,6 +723,23 @@ while running:
 
         if e.type == MOUSEBUTTONDOWN and btn_play.rect.collidepoint(Mouse) and game == "menu":
             game = "difficulty selection"
+
+        if e.type == MOUSEBUTTONDOWN and btn_sound_up.rect.collidepoint(Mouse):
+            volume = volume + 0.101
+            mixer.music.set_volume(volume)
+  
+            if volume_int == 10:
+                pass
+            else:
+                volume_int += 1
+
+        if e.type == MOUSEBUTTONDOWN and btn_sound_down.rect.collidepoint(Mouse):
+            volume = volume - 0.101
+            mixer.music.set_volume(volume)
+            if volume_int == 0:
+                pass
+            else:
+                volume_int -= 1
 
         if e.type == MOUSEBUTTONDOWN and btn_exit.rect.collidepoint(Mouse) and game == "menu":
             running = False
@@ -778,6 +801,10 @@ while running:
         btn_play.reset()
         btn_exit.reset()
         btn_settings.reset()
+        if mute == True:
+            mixer.music.pause()
+        if mute == False:
+            mixer.music.unpause()
         if btn_play.rect.collidepoint(Mouse):
             btn_play = GameSprite("Fumo Hero/sprites/button_play_pressed.png", 260, 80, 0, 320, 132)
         elif not btn_play.rect.collidepoint(Mouse):
@@ -798,6 +825,15 @@ while running:
         screen.blit(background, (0, 0))
         btn_sound.reset()
         btn_back.reset()
+        btn_sound_up.reset()
+        btn_sound_down.reset()
+        text = font.render(f"{volume_int}", True, (255, 255, 255))
+        screen.blit(text, (425, 350))
+        if mute == True:
+            mixer.music.pause()
+        if mute == False:
+            mixer.music.unpause()
+
         if btn_back.rect.collidepoint(Mouse):
             btn_back = GameSprite("Fumo Hero/sprites/button_back_pressed.png", 5, 10, 0, 320, 132)
         elif not btn_back.rect.collidepoint(Mouse):
