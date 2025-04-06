@@ -63,7 +63,7 @@ class Player(GameSprite):
     counter_s_attack = 0
     counter_right = 0
     counter_left = 0
-    health_counter = 100 #3
+    health_counter = 3 #3
     bomb_counter = 3 #3
 
     Health_image = transform.scale(image.load("Fumo Hero/sprites/Health.png"), (64, 64))
@@ -164,11 +164,14 @@ class Player(GameSprite):
                 self.counter_left = 0
     def health(self, health_counter):
         global running
+        global round_over
+        global game
         self.health_counter -= 1
         self.rect.x =(win_width / 2) - 65
         self.rect.y = win_height - 160
         if self.health_counter < 0:
-            running = False
+            round_over = True
+            game = "lose"
 
 
     def bombadd(self):
@@ -655,6 +658,16 @@ def show_end_game_menu():
     screen.blit(instructions1, instructions_rect1)
     display.flip()
 
+def show_lose_menu():
+    text = font.render(f"Ви програли!", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(400, 300))  # Розміщуємо текст по центру екрану
+    screen.blit(text, text_rect)
+
+    instructions1 = font.render("Натисніть Esc щоб вийти з гри", True, (255, 255, 255))
+    instructions_rect1 = instructions1.get_rect(center=(400, 400))  # Знову розміщаємо по центру
+    screen.blit(instructions1, instructions_rect1)
+    display.flip()
+
 def restart_game():
     global start_time_game
     global elapsed_time
@@ -794,6 +807,9 @@ while running:
         screen.blit(background, (0,0))
         show_end_game_menu()
     
+    if game == "lose":
+        screen.blit(background, (0,0))
+        show_lose_menu()
 
     if game == "menu":
         Mouse = mouse.get_pos()
